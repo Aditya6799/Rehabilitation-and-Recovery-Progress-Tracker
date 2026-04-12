@@ -1,0 +1,22 @@
+{
+  "name": "rehab-tracker-backend",
+  "version": "1.0.0",
+  "description": "Rehabilitation & Recovery Progress Tracker - Backend API",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "mongoose": "^8.8.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "@google/generative-ai": "^0.21.0"
+  },
+  "keywords": ["rehabilitation", "health", "tracker", "express", "mongodb"],
+  "author": "",
+  "license": "ISC"
+}

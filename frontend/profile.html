@@ -1,0 +1,912 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Manage your Precision Recovery profile, update personal information, and change account settings."
+    />
+    <title>Precision Recovery | Profile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #0059bb;
+        --primary-container: #0070ea;
+        --primary-fixed: #d8e2ff;
+        --primary-fixed-dim: #adc7ff;
+        --on-primary: #fff;
+        --secondary: #405e96;
+        --secondary-container: #a4c1ff;
+        --tertiary: #9e3d00;
+        --tertiary-container: #c64f00;
+        --tertiary-fixed: #ffdbcc;
+        --surface: #f7f9fc;
+        --surface-container: #eceef1;
+        --surface-container-low: #f2f4f7;
+        --surface-container-lowest: #fff;
+        --surface-container-high: #e6e8eb;
+        --surface-container-highest: #e0e3e6;
+        --on-surface: #191c1e;
+        --on-surface-variant: #414754;
+        --outline: #717786;
+        --outline-variant: #c1c6d7;
+        --error: #ba1a1a;
+        --error-container: #ffdad6;
+        --font-headline: "Manrope", sans-serif;
+        --font-body: "Inter", sans-serif;
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+        --radius-2xl: 24px;
+        --radius-full: 9999px;
+        --shadow-sm: 0 2px 8px rgba(0, 89, 187, 0.04);
+        --shadow-md: 0 4px 16px rgba(0, 89, 187, 0.06);
+        --shadow-lg: 0 8px 32px rgba(0, 89, 187, 0.08);
+        --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      body.dark {
+        --primary: #adc7ff;
+        --primary-container: #004493;
+        --primary-fixed: #d8e2ff;
+        --primary-fixed-dim: #adc7ff;
+        --on-primary: #002e6b;
+        --secondary: #adc7ff;
+        --secondary-container: #26467c;
+        --tertiary: #ffb695;
+        --tertiary-container: #7c2e00;
+        --tertiary-fixed: #ffdbcc;
+        --surface: #111416;
+        --surface-container: #1d2022;
+        --surface-container-low: #191c1e;
+        --surface-container-lowest: #0c0f11;
+        --surface-container-high: #272a2d;
+        --surface-container-highest: #323538;
+        --on-surface: #e0e3e6;
+        --on-surface-variant: #c1c6d7;
+        --outline: #8b91a1;
+        --outline-variant: #414754;
+        --error: #ffb4ab;
+        --error-container: #93000a;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: var(--font-body);
+        background: var(--surface);
+        color: var(--on-surface);
+        transition:
+          background var(--transition),
+          color var(--transition);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      .app-layout {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 260px;
+        background: var(--surface-container-low);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 50;
+        transition: transform var(--transition);
+      }
+      .sidebar-header {
+        padding: 24px 24px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .sidebar-logo-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-container)
+        );
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 18px;
+      }
+      .sidebar-logo-text {
+        font-family: var(--font-headline);
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .sidebar-nav {
+        flex: 1;
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--on-surface-variant);
+        transition: all var(--transition);
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+        font-family: var(--font-body);
+      }
+      .sidebar-link:hover {
+        background: var(--surface-container);
+        color: var(--on-surface);
+      }
+      .sidebar-link.active {
+        background: var(--primary-fixed);
+        color: var(--primary);
+        font-weight: 600;
+      }
+      body.dark .sidebar-link.active {
+        background: var(--primary-container);
+        color: var(--primary-fixed-dim);
+      }
+      .sidebar-link-icon {
+        font-size: 18px;
+        width: 24px;
+        text-align: center;
+      }
+      .sidebar-divider {
+        height: 1px;
+        background: var(--outline-variant);
+        opacity: 0.3;
+        margin: 12px 16px;
+      }
+      .sidebar-footer {
+        padding: 16px 12px;
+      }
+      .sidebar-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        background: var(--surface-container);
+      }
+      .sidebar-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-full);
+        background: linear-gradient(
+          135deg,
+          var(--primary-fixed-dim),
+          var(--primary-fixed)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: var(--primary);
+      }
+      .sidebar-user-name {
+        font-size: 0.82rem;
+        font-weight: 600;
+      }
+      .sidebar-user-role {
+        font-size: 0.7rem;
+        color: var(--on-surface-variant);
+        text-transform: capitalize;
+      }
+      .main-content {
+        flex: 1;
+        margin-left: 260px;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .topbar {
+        padding: 16px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--surface);
+        position: sticky;
+        top: 0;
+        z-index: 40;
+      }
+      .topbar-left h1 {
+        font-family: var(--font-headline);
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .topbar-left p {
+        font-size: 0.8rem;
+        color: var(--on-surface-variant);
+        margin-top: 2px;
+      }
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .topbar-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        background: var(--surface-container);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: var(--on-surface-variant);
+        transition: all var(--transition);
+      }
+      .topbar-btn:hover {
+        background: var(--surface-container-high);
+        color: var(--primary);
+      }
+      .mobile-toggle {
+        display: none;
+      }
+      .content {
+        flex: 1;
+        padding: 0 32px 32px;
+      }
+
+      .profile-layout {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 24px;
+        max-width: 1000px;
+      }
+      .profile-sidebar {
+        background: var(--surface-container-lowest);
+        border-radius: var(--radius-2xl);
+        padding: 36px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+      .profile-avatar {
+        width: 96px;
+        height: 96px;
+        border-radius: var(--radius-full);
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-container)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #fff;
+        font-family: var(--font-headline);
+        margin-bottom: 20px;
+        letter-spacing: -0.02em;
+      }
+      .profile-name {
+        font-family: var(--font-headline);
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .profile-email {
+        font-size: 0.82rem;
+        color: var(--on-surface-variant);
+        margin-bottom: 8px;
+      }
+      .profile-role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: var(--radius-full);
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 20px;
+      }
+      .profile-role-badge.patient {
+        background: var(--primary-fixed);
+        color: var(--primary);
+      }
+      .profile-role-badge.doctor {
+        background: var(--tertiary-fixed);
+        color: var(--tertiary);
+      }
+      body.dark .profile-role-badge.patient {
+        background: #1a2744;
+      }
+      body.dark .profile-role-badge.doctor {
+        background: #3b1d00;
+        color: #ffb695;
+      }
+      .profile-meta {
+        width: 100%;
+        margin-top: 16px;
+      }
+      .profile-meta-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        font-size: 0.82rem;
+      }
+      .profile-meta-item + .profile-meta-item {
+        border-top: 1px solid rgba(193, 198, 215, 0.12);
+      }
+      .profile-meta-item span:first-child {
+        color: var(--on-surface-variant);
+      }
+      .profile-meta-item span:last-child {
+        font-weight: 600;
+      }
+
+      .card {
+        background: var(--surface-container-lowest);
+        border-radius: var(--radius-xl);
+        padding: 28px;
+        margin-bottom: 20px;
+      }
+      .card-title {
+        font-family: var(--font-headline);
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        letter-spacing: -0.01em;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-group.full {
+        grid-column: 1/-1;
+      }
+      .form-label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--on-surface);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .form-input,
+      .form-textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 2px solid transparent;
+        border-radius: var(--radius-md);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        background: var(--surface-container-high);
+        color: var(--on-surface);
+        transition: all var(--transition);
+        outline: none;
+      }
+      .form-input:focus,
+      .form-textarea:focus {
+        background: var(--surface-container-lowest);
+        border-color: rgba(0, 89, 187, 0.3);
+        box-shadow: 0 0 0 4px rgba(0, 89, 187, 0.08);
+      }
+      body.dark .form-input:focus,
+      body.dark .form-textarea:focus {
+        border-color: rgba(173, 199, 255, 0.3);
+        box-shadow: 0 0 0 4px rgba(173, 199, 255, 0.08);
+      }
+      .form-textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: var(--radius-md);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-container)
+        );
+        color: #fff;
+        box-shadow: var(--shadow-sm);
+      }
+      body.dark .btn-primary {
+        color: #0a1628;
+      }
+      .btn-primary:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .toast {
+        padding: 14px 20px;
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+        font-weight: 500;
+        box-shadow: var(--shadow-lg);
+        animation: slideIn 0.3s ease;
+        max-width: 380px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .toast.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .toast.error {
+        background: var(--error-container);
+        color: var(--error);
+      }
+      body.dark .toast.success {
+        background: #1b3a1e;
+        color: #66bb6a;
+      }
+      body.dark .toast.error {
+        background: #3c1111;
+        color: #ef9a9a;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .profile-layout {
+          grid-template-columns: 1fr;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main-content {
+          margin-left: 0;
+        }
+        .mobile-toggle {
+          display: flex;
+        }
+        .topbar {
+          padding: 12px 20px;
+        }
+        .content {
+          padding: 0 20px 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo-icon">⚕</div>
+          <span class="sidebar-logo-text">Precision Recovery</span>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav"></nav>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-footer">
+          <div class="sidebar-user">
+            <div class="sidebar-avatar" id="sidebarAvatar">--</div>
+            <div>
+              <div class="sidebar-user-name" id="sidebarName">Loading...</div>
+              <div class="sidebar-user-role" id="sidebarRole">—</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <main class="main-content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button
+              class="topbar-btn mobile-toggle"
+              id="mobileToggle"
+              aria-label="Toggle sidebar"
+            >
+              ☰
+            </button>
+            <h1>Profile</h1>
+            <p>Manage your account information</p>
+          </div>
+          <div class="topbar-actions">
+            <button
+              class="topbar-btn"
+              id="themeToggle"
+              aria-label="Toggle dark mode"
+            >
+              🌙
+            </button>
+            <button class="topbar-btn" id="logoutBtn" aria-label="Logout">
+              🚪
+            </button>
+          </div>
+        </header>
+        <div class="content">
+          <div class="profile-layout">
+            <!-- Profile Sidebar -->
+            <div class="profile-sidebar" id="profileSidebar">
+              <div class="profile-avatar" id="profileAvatar">--</div>
+              <div class="profile-name" id="profileName">Loading...</div>
+              <div class="profile-email" id="profileEmail">...</div>
+              <div class="profile-role-badge" id="profileBadge">...</div>
+              <div class="profile-meta" id="profileMeta"></div>
+            </div>
+
+            <!-- Profile Forms -->
+            <div>
+              <div class="card">
+                <div class="card-title">Personal Information</div>
+                <form id="profileForm" class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input
+                      type="text"
+                      class="form-input"
+                      id="profName"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input
+                      type="tel"
+                      class="form-input"
+                      id="profPhone"
+                      placeholder="+1 (555) 000-0000"
+                    />
+                  </div>
+                  <div class="form-group full">
+                    <label class="form-label">Bio</label>
+                    <textarea
+                      class="form-textarea"
+                      id="profBio"
+                      placeholder="Tell us about yourself..."
+                    ></textarea>
+                  </div>
+                  <div class="form-group full" id="roleSpecificFields"></div>
+                  <div class="form-group full" style="text-align: right">
+                    <button type="submit" class="btn btn-primary">
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              <div class="card">
+                <div class="card-title">Change Password</div>
+                <form id="passwordForm" class="form-grid">
+                  <div class="form-group">
+                    <label class="form-label">Current Password</label>
+                    <input
+                      type="password"
+                      class="form-input"
+                      id="currentPassword"
+                      required
+                    />
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">New Password</label>
+                    <input
+                      type="password"
+                      class="form-input"
+                      id="newPassword"
+                      placeholder="Min. 6 characters"
+                      required
+                    />
+                  </div>
+                  <div class="form-group full" style="text-align: right">
+                    <button type="submit" class="btn btn-primary">
+                      Update Password
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+      const API_BASE = "http://localhost:5000/api";
+      function getToken() {
+        return localStorage.getItem("token");
+      }
+      function getUser() {
+        try {
+          return JSON.parse(localStorage.getItem("user"));
+        } catch {
+          return null;
+        }
+      }
+      async function api(endpoint, options = {}) {
+        const token = getToken();
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          ...options,
+        };
+        const res = await fetch(`${API_BASE}${endpoint}`, config);
+        const data = await res.json();
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          window.location.href = "login.html";
+          return;
+        }
+        if (!res.ok) throw new Error(data.error || "Request failed");
+        return data;
+      }
+      function showToast(msg, type = "error") {
+        const c = document.getElementById("toastContainer");
+        const t = document.createElement("div");
+        t.className = `toast ${type}`;
+        t.innerHTML = `${type === "success" ? "✓" : "⚠"} ${msg}`;
+        c.appendChild(t);
+        setTimeout(() => {
+          t.style.opacity = "0";
+          setTimeout(() => t.remove(), 300);
+        }, 4000);
+      }
+
+      const token = getToken();
+      const user = getUser();
+      if (!token || !user) window.location.href = "login.html";
+
+      (function () {
+        if (localStorage.getItem("theme") === "dark") {
+          document.body.classList.add("dark");
+          document.getElementById("themeToggle").textContent = "☀️";
+        }
+      })();
+      document.getElementById("themeToggle").addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+        const d = document.body.classList.contains("dark");
+        localStorage.setItem("theme", d ? "dark" : "light");
+        document.getElementById("themeToggle").textContent = d ? "☀️" : "🌙";
+      });
+
+      function renderSidebar() {
+        const nav = document.getElementById("sidebarNav");
+        const pLinks = [
+          { icon: "📊", label: "Dashboard", href: "dashboard.html" },
+          { icon: "📈", label: "Progress", href: "progress.html" },
+          { icon: "🏋️", label: "Exercises", href: "exercises.html" },
+          { icon: "📅", label: "Appointments", href: "appointments.html" },
+          { icon: "👤", label: "Profile", href: "profile.html" },
+        ];
+        const dLinks = [
+          { icon: "📊", label: "Dashboard", href: "dashboard.html" },
+          { icon: "👥", label: "Patients", href: "progress.html" },
+          { icon: "🏋️", label: "Exercises", href: "exercises.html" },
+          { icon: "📅", label: "Appointments", href: "appointments.html" },
+          { icon: "👤", label: "Profile", href: "profile.html" },
+        ];
+        const links = user.role === "doctor" ? dLinks : pLinks;
+        const cur = window.location.pathname.split("/").pop();
+        nav.innerHTML = links
+          .map(
+            (l) =>
+              `<a class="sidebar-link ${cur === l.href ? "active" : ""}" href="${l.href}"><span class="sidebar-link-icon">${l.icon}</span>${l.label}</a>`,
+          )
+          .join("");
+        document.getElementById("sidebarAvatar").textContent = user.name
+          ? user.name
+              .split(" ")
+              .map((w) => w[0])
+              .join("")
+              .toUpperCase()
+              .slice(0, 2)
+          : "--";
+        document.getElementById("sidebarName").textContent = user.name;
+        document.getElementById("sidebarRole").textContent = user.role;
+      }
+      renderSidebar();
+      document
+        .getElementById("mobileToggle")
+        .addEventListener("click", () =>
+          document.getElementById("sidebar").classList.toggle("open"),
+        );
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+      });
+
+      // Load profile
+      async function loadProfile() {
+        try {
+          const profile = await api("/profile");
+          const initials = profile.name
+            ? profile.name
+                .split(" ")
+                .map((w) => w[0])
+                .join("")
+                .toUpperCase()
+                .slice(0, 2)
+            : "--";
+
+          document.getElementById("profileAvatar").textContent = initials;
+          document.getElementById("profileName").textContent = profile.name;
+          document.getElementById("profileEmail").textContent = profile.email;
+
+          const badge = document.getElementById("profileBadge");
+          badge.className = `profile-role-badge ${profile.role}`;
+          badge.textContent =
+            profile.role === "patient" ? "👤 Patient" : "🩺 Doctor";
+
+          document.getElementById("profileMeta").innerHTML = `
+          <div class="profile-meta-item"><span>Member Since</span><span>${new Date(profile.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span></div>
+          <div class="profile-meta-item"><span>Phone</span><span>${profile.phone || "Not set"}</span></div>
+          ${profile.role === "doctor" ? `<div class="profile-meta-item"><span>Specialization</span><span>${profile.specialization || "Not set"}</span></div>` : ""}
+        `;
+
+          // Fill form
+          document.getElementById("profName").value = profile.name || "";
+          document.getElementById("profPhone").value = profile.phone || "";
+          document.getElementById("profBio").value = profile.bio || "";
+
+          // Role-specific fields
+          const roleFields = document.getElementById("roleSpecificFields");
+          if (profile.role === "doctor") {
+            roleFields.innerHTML = `
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label">Specialization</label>
+                <input type="text" class="form-input" id="profSpecialization" value="${profile.specialization || ""}" placeholder="e.g., Orthopedic Rehabilitation">
+              </div>
+              <div class="form-group">
+                <label class="form-label">License Number</label>
+                <input type="text" class="form-input" id="profLicense" value="${profile.licenseNumber || ""}" placeholder="MED-XXXXX">
+              </div>
+            </div>
+          `;
+          } else {
+            roleFields.innerHTML = `
+            <div class="form-group">
+              <label class="form-label">Medical History</label>
+              <textarea class="form-textarea" id="profMedHistory" placeholder="Any relevant medical history...">${profile.medicalHistory || ""}</textarea>
+            </div>
+          `;
+          }
+        } catch (err) {
+          showToast("Failed to load profile: " + err.message);
+        }
+      }
+
+      // Save profile
+      document
+        .getElementById("profileForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const body = {
+            name: document.getElementById("profName").value,
+            phone: document.getElementById("profPhone").value,
+            bio: document.getElementById("profBio").value,
+          };
+          if (user.role === "doctor") {
+            const spec = document.getElementById("profSpecialization");
+            const lic = document.getElementById("profLicense");
+            if (spec) body.specialization = spec.value;
+            if (lic) body.licenseNumber = lic.value;
+          } else {
+            const med = document.getElementById("profMedHistory");
+            if (med) body.medicalHistory = med.value;
+          }
+          try {
+            const updated = await api("/profile", {
+              method: "PUT",
+              body: JSON.stringify(body),
+            });
+            // Update localStorage
+            const u = getUser();
+            u.name = body.name;
+            localStorage.setItem("user", JSON.stringify(u));
+            showToast("Profile updated!", "success");
+            renderSidebar();
+            loadProfile();
+          } catch (err) {
+            showToast(err.message);
+          }
+        });
+
+      // Change password
+      document
+        .getElementById("passwordForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const current = document.getElementById("currentPassword").value;
+          const newPw = document.getElementById("newPassword").value;
+          if (newPw.length < 6) {
+            showToast("New password must be at least 6 characters");
+            return;
+          }
+          try {
+            await api("/profile", {
+              method: "PUT",
+              body: JSON.stringify({
+                currentPassword: current,
+                newPassword: newPw,
+              }),
+            });
+            showToast("Password updated!", "success");
+            document.getElementById("currentPassword").value = "";
+            document.getElementById("newPassword").value = "";
+          } catch (err) {
+            showToast(err.message);
+          }
+        });
+
+      loadProfile();
+    </script>
+  </body>
+</html>

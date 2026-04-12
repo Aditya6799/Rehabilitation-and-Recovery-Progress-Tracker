@@ -1,0 +1,1150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Browse and manage rehabilitation exercises. Doctors create protocols, patients view and complete assigned exercises."
+    />
+    <title>Precision Recovery | Exercises</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary: #0059bb;
+        --primary-container: #0070ea;
+        --primary-fixed: #d8e2ff;
+        --primary-fixed-dim: #adc7ff;
+        --on-primary: #fff;
+        --secondary: #405e96;
+        --secondary-container: #a4c1ff;
+        --tertiary: #9e3d00;
+        --tertiary-container: #c64f00;
+        --tertiary-fixed: #ffdbcc;
+        --surface: #f7f9fc;
+        --surface-container: #eceef1;
+        --surface-container-low: #f2f4f7;
+        --surface-container-lowest: #fff;
+        --surface-container-high: #e6e8eb;
+        --surface-container-highest: #e0e3e6;
+        --on-surface: #191c1e;
+        --on-surface-variant: #414754;
+        --outline: #717786;
+        --outline-variant: #c1c6d7;
+        --error: #ba1a1a;
+        --error-container: #ffdad6;
+        --font-headline: "Manrope", sans-serif;
+        --font-body: "Inter", sans-serif;
+        --radius-sm: 4px;
+        --radius-md: 8px;
+        --radius-lg: 12px;
+        --radius-xl: 16px;
+        --radius-2xl: 24px;
+        --radius-full: 9999px;
+        --shadow-sm: 0 2px 8px rgba(0, 89, 187, 0.04);
+        --shadow-md: 0 4px 16px rgba(0, 89, 187, 0.06);
+        --shadow-lg: 0 8px 32px rgba(0, 89, 187, 0.08);
+        --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      body.dark {
+        --primary: #adc7ff;
+        --primary-container: #004493;
+        --primary-fixed: #d8e2ff;
+        --primary-fixed-dim: #adc7ff;
+        --on-primary: #002e6b;
+        --secondary: #adc7ff;
+        --secondary-container: #26467c;
+        --tertiary: #ffb695;
+        --tertiary-container: #7c2e00;
+        --tertiary-fixed: #ffdbcc;
+        --surface: #111416;
+        --surface-container: #1d2022;
+        --surface-container-low: #191c1e;
+        --surface-container-lowest: #0c0f11;
+        --surface-container-high: #272a2d;
+        --surface-container-highest: #323538;
+        --on-surface: #e0e3e6;
+        --on-surface-variant: #c1c6d7;
+        --outline: #8b91a1;
+        --outline-variant: #414754;
+        --error: #ffb4ab;
+        --error-container: #93000a;
+        --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+        --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35);
+        --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+      }
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: var(--font-body);
+        background: var(--surface);
+        color: var(--on-surface);
+        transition:
+          background var(--transition),
+          color var(--transition);
+      }
+      a {
+        text-decoration: none;
+        color: inherit;
+      }
+      .app-layout {
+        display: flex;
+        min-height: 100vh;
+      }
+      .sidebar {
+        width: 260px;
+        background: var(--surface-container-low);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 50;
+        transition: transform var(--transition);
+      }
+      .sidebar-header {
+        padding: 24px 24px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .sidebar-logo-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-container)
+        );
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 18px;
+      }
+      .sidebar-logo-text {
+        font-family: var(--font-headline);
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .sidebar-nav {
+        flex: 1;
+        padding: 8px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .sidebar-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--on-surface-variant);
+        transition: all var(--transition);
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        width: 100%;
+        text-align: left;
+        font-family: var(--font-body);
+      }
+      .sidebar-link:hover {
+        background: var(--surface-container);
+        color: var(--on-surface);
+      }
+      .sidebar-link.active {
+        background: var(--primary-fixed);
+        color: var(--primary);
+        font-weight: 600;
+      }
+      body.dark .sidebar-link.active {
+        background: var(--primary-container);
+        color: var(--primary-fixed-dim);
+      }
+      .sidebar-link-icon {
+        font-size: 18px;
+        width: 24px;
+        text-align: center;
+      }
+      .sidebar-divider {
+        height: 1px;
+        background: var(--outline-variant);
+        opacity: 0.3;
+        margin: 12px 16px;
+      }
+      .sidebar-footer {
+        padding: 16px 12px;
+      }
+      .sidebar-user {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: var(--radius-md);
+        background: var(--surface-container);
+      }
+      .sidebar-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-full);
+        background: linear-gradient(
+          135deg,
+          var(--primary-fixed-dim),
+          var(--primary-fixed)
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.8rem;
+        color: var(--primary);
+      }
+      .sidebar-user-name {
+        font-size: 0.82rem;
+        font-weight: 600;
+      }
+      .sidebar-user-role {
+        font-size: 0.7rem;
+        color: var(--on-surface-variant);
+        text-transform: capitalize;
+      }
+      .main-content {
+        flex: 1;
+        margin-left: 260px;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+      .topbar {
+        padding: 16px 32px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--surface);
+        position: sticky;
+        top: 0;
+        z-index: 40;
+      }
+      .topbar-left h1 {
+        font-family: var(--font-headline);
+        font-size: 1.5rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .topbar-left p {
+        font-size: 0.8rem;
+        color: var(--on-surface-variant);
+        margin-top: 2px;
+      }
+      .topbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .topbar-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-full);
+        background: var(--surface-container);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        color: var(--on-surface-variant);
+        transition: all var(--transition);
+      }
+      .topbar-btn:hover {
+        background: var(--surface-container-high);
+        color: var(--primary);
+      }
+      .mobile-toggle {
+        display: none;
+      }
+      .content {
+        flex: 1;
+        padding: 0 32px 32px;
+      }
+
+      .page-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .filter-bar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .filter-chip {
+        padding: 8px 16px;
+        border-radius: var(--radius-full);
+        border: 1.5px solid var(--outline-variant);
+        background: transparent;
+        color: var(--on-surface-variant);
+        font-size: 0.78rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all var(--transition);
+        font-family: var(--font-body);
+      }
+      .filter-chip:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .filter-chip.active {
+        background: var(--primary-fixed);
+        border-color: var(--primary);
+        color: var(--primary);
+        font-weight: 600;
+      }
+      body.dark .filter-chip.active {
+        background: var(--primary-container);
+        color: var(--primary-fixed-dim);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: var(--radius-md);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+      .btn-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-container)
+        );
+        color: #fff;
+        box-shadow: var(--shadow-sm);
+      }
+      body.dark .btn-primary {
+        color: #0a1628;
+      }
+      .btn-primary:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-1px);
+      }
+      .btn-sm {
+        padding: 8px 14px;
+        font-size: 0.78rem;
+      }
+      .btn-danger {
+        background: var(--error-container);
+        color: var(--error);
+      }
+      .btn-danger:hover {
+        box-shadow: var(--shadow-sm);
+      }
+
+      .exercises-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+      }
+      .exercise-card {
+        background: var(--surface-container-lowest);
+        border-radius: var(--radius-xl);
+        padding: 24px;
+        transition: all var(--transition);
+        position: relative;
+        overflow: hidden;
+      }
+      .exercise-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+      }
+      .exercise-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .exercise-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-lg);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+      }
+      .exercise-icon.stretching {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .exercise-icon.strengthening {
+        background: #fce4ec;
+        color: #c62828;
+      }
+      .exercise-icon.balance {
+        background: #f3e8ff;
+        color: #7c3aed;
+      }
+      .exercise-icon.cardio {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .exercise-icon.flexibility {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .exercise-icon.mobility {
+        background: #e0f2f1;
+        color: #00897b;
+      }
+      .exercise-icon.other {
+        background: var(--surface-container);
+        color: var(--on-surface-variant);
+      }
+      body.dark .exercise-icon.stretching {
+        background: #0d2137;
+      }
+      body.dark .exercise-icon.strengthening {
+        background: #3c1111;
+        color: #ef9a9a;
+      }
+      body.dark .exercise-icon.balance {
+        background: #2d1854;
+        color: #b388ff;
+      }
+      body.dark .exercise-icon.cardio {
+        background: #1b3a1e;
+        color: #66bb6a;
+      }
+      body.dark .exercise-icon.flexibility {
+        background: #3b2500;
+        color: #ffb74d;
+      }
+      body.dark .exercise-icon.mobility {
+        background: #0a3b36;
+        color: #4db6ac;
+      }
+      .exercise-diff {
+        font-size: 0.68rem;
+        padding: 4px 10px;
+        border-radius: var(--radius-full);
+        font-weight: 600;
+      }
+      .exercise-diff.beginner {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .exercise-diff.intermediate {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .exercise-diff.advanced {
+        background: var(--error-container);
+        color: var(--error);
+      }
+      body.dark .exercise-diff.beginner {
+        background: #1b3a1e;
+        color: #66bb6a;
+      }
+      body.dark .exercise-diff.intermediate {
+        background: #3b2500;
+        color: #ffb74d;
+      }
+      body.dark .exercise-diff.advanced {
+        background: #3c1111;
+        color: #ef9a9a;
+      }
+      .exercise-card h3 {
+        font-family: var(--font-headline);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        letter-spacing: -0.01em;
+      }
+      .exercise-meta {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+      .exercise-meta span {
+        font-size: 0.75rem;
+        color: var(--on-surface-variant);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+      .exercise-card p {
+        font-size: 0.82rem;
+        color: var(--on-surface-variant);
+        line-height: 1.5;
+        margin-bottom: 16px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .exercise-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      /* ── Modal ──────────────────────────────────────── */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+        z-index: 300;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--surface-container-lowest);
+        border-radius: var(--radius-2xl);
+        padding: 36px;
+        max-width: 560px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: var(--shadow-lg);
+      }
+      .modal h3 {
+        font-family: var(--font-headline);
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .modal > p {
+        font-size: 0.85rem;
+        color: var(--on-surface-variant);
+        margin-bottom: 24px;
+      }
+      .form-group {
+        margin-bottom: 16px;
+      }
+      .form-label {
+        display: block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--on-surface);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .form-input,
+      .form-select,
+      .form-textarea {
+        width: 100%;
+        padding: 12px 14px;
+        border: 2px solid transparent;
+        border-radius: var(--radius-md);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        background: var(--surface-container-high);
+        color: var(--on-surface);
+        transition: all var(--transition);
+        outline: none;
+      }
+      .form-input:focus,
+      .form-select:focus,
+      .form-textarea:focus {
+        background: var(--surface-container-lowest);
+        border-color: rgba(0, 89, 187, 0.3);
+        box-shadow: 0 0 0 4px rgba(0, 89, 187, 0.08);
+      }
+      body.dark .form-input:focus,
+      body.dark .form-select:focus,
+      body.dark .form-textarea:focus {
+        border-color: rgba(173, 199, 255, 0.3);
+        box-shadow: 0 0 0 4px rgba(173, 199, 255, 0.08);
+      }
+      .form-select {
+        appearance: none;
+        cursor: pointer;
+      }
+      .form-textarea {
+        resize: vertical;
+        min-height: 80px;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .modal-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+        margin-top: 24px;
+      }
+      .btn-ghost {
+        background: var(--surface-container);
+        color: var(--on-surface-variant);
+      }
+      .btn-ghost:hover {
+        background: var(--surface-container-high);
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--on-surface-variant);
+      }
+      .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 12px;
+        opacity: 0.3;
+      }
+
+      .toast-container {
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .toast {
+        padding: 14px 20px;
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+        font-weight: 500;
+        box-shadow: var(--shadow-lg);
+        animation: slideIn 0.3s ease;
+        max-width: 380px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .toast.success {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .toast.error {
+        background: var(--error-container);
+        color: var(--error);
+      }
+      body.dark .toast.success {
+        background: #1b3a1e;
+        color: #66bb6a;
+      }
+      body.dark .toast.error {
+        background: #3c1111;
+        color: #ef9a9a;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main-content {
+          margin-left: 0;
+        }
+        .mobile-toggle {
+          display: flex;
+        }
+        .topbar {
+          padding: 12px 20px;
+        }
+        .content {
+          padding: 0 20px 20px;
+        }
+        .exercises-grid {
+          grid-template-columns: 1fr;
+        }
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo-icon">⚕</div>
+          <span class="sidebar-logo-text">Precision Recovery</span>
+        </div>
+        <nav class="sidebar-nav" id="sidebarNav"></nav>
+        <div class="sidebar-divider"></div>
+        <div class="sidebar-footer">
+          <div class="sidebar-user">
+            <div class="sidebar-avatar" id="sidebarAvatar">--</div>
+            <div>
+              <div class="sidebar-user-name" id="sidebarName">Loading...</div>
+              <div class="sidebar-user-role" id="sidebarRole">—</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+      <main class="main-content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button
+              class="topbar-btn mobile-toggle"
+              id="mobileToggle"
+              aria-label="Toggle sidebar"
+            >
+              ☰
+            </button>
+            <h1>Exercise Library</h1>
+            <p id="pageSubtitle">Browse and manage rehabilitation exercises</p>
+          </div>
+          <div class="topbar-actions">
+            <button
+              class="topbar-btn"
+              id="themeToggle"
+              aria-label="Toggle dark mode"
+            >
+              🌙
+            </button>
+            <button class="topbar-btn" id="logoutBtn" aria-label="Logout">
+              🚪
+            </button>
+          </div>
+        </header>
+        <div class="content">
+          <div class="page-actions">
+            <div class="filter-bar" id="filterBar">
+              <button
+                class="filter-chip active"
+                onclick="filterExercises('all', this)"
+              >
+                All
+              </button>
+              <button
+                class="filter-chip"
+                onclick="filterExercises('stretching', this)"
+              >
+                Stretching
+              </button>
+              <button
+                class="filter-chip"
+                onclick="filterExercises('strengthening', this)"
+              >
+                Strengthening
+              </button>
+              <button
+                class="filter-chip"
+                onclick="filterExercises('balance', this)"
+              >
+                Balance
+              </button>
+              <button
+                class="filter-chip"
+                onclick="filterExercises('cardio', this)"
+              >
+                Cardio
+              </button>
+              <button
+                class="filter-chip"
+                onclick="filterExercises('flexibility', this)"
+              >
+                Flexibility
+              </button>
+              <button
+                class="filter-chip"
+                onclick="filterExercises('mobility', this)"
+              >
+                Mobility
+              </button>
+            </div>
+            <div id="doctorActions"></div>
+          </div>
+          <div class="exercises-grid" id="exercisesGrid">
+            <div class="empty-state">
+              <div class="empty-state-icon">🏋️</div>
+              <p>Loading exercises...</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Create/Edit Modal -->
+    <div class="modal-overlay" id="exerciseModal">
+      <div class="modal">
+        <h3 id="modalTitle">Create Exercise</h3>
+        <p>Define a new rehabilitation exercise protocol.</p>
+        <form id="exerciseForm">
+          <div class="form-group">
+            <label class="form-label">Exercise Title</label>
+            <input
+              type="text"
+              class="form-input"
+              id="exTitle"
+              placeholder="e.g., Quad Stretch"
+              required
+            />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="exCategory">
+                <option value="stretching">Stretching</option>
+                <option value="strengthening">Strengthening</option>
+                <option value="balance">Balance</option>
+                <option value="cardio">Cardio</option>
+                <option value="flexibility">Flexibility</option>
+                <option value="mobility">Mobility</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Duration (minutes)</label>
+              <input
+                type="number"
+                class="form-input"
+                id="exDuration"
+                min="1"
+                value="15"
+                required
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Difficulty</label>
+            <select class="form-select" id="exDifficulty">
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Instructions</label>
+            <textarea
+              class="form-textarea"
+              id="exInstructions"
+              placeholder="Step-by-step instructions..."
+              required
+            ></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost" onclick="closeModal()">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary" id="modalSubmitBtn">
+              Create Exercise
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+      const API_BASE = "http://localhost:5000/api";
+      function getToken() {
+        return localStorage.getItem("token");
+      }
+      function getUser() {
+        try {
+          return JSON.parse(localStorage.getItem("user"));
+        } catch {
+          return null;
+        }
+      }
+      async function api(endpoint, options = {}) {
+        const token = getToken();
+        const config = {
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          ...options,
+        };
+        const res = await fetch(`${API_BASE}${endpoint}`, config);
+        const data = await res.json();
+        if (res.status === 401) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          window.location.href = "login.html";
+          return;
+        }
+        if (!res.ok) throw new Error(data.error || "Request failed");
+        return data;
+      }
+      function showToast(msg, type = "error") {
+        const c = document.getElementById("toastContainer");
+        const t = document.createElement("div");
+        t.className = `toast ${type}`;
+        t.innerHTML = `${type === "success" ? "✓" : "⚠"} ${msg}`;
+        c.appendChild(t);
+        setTimeout(() => {
+          t.style.opacity = "0";
+          setTimeout(() => t.remove(), 300);
+        }, 4000);
+      }
+
+      const token = getToken();
+      const user = getUser();
+      if (!token || !user) window.location.href = "login.html";
+
+      (function () {
+        if (localStorage.getItem("theme") === "dark") {
+          document.body.classList.add("dark");
+          document.getElementById("themeToggle").textContent = "☀️";
+        }
+      })();
+      document.getElementById("themeToggle").addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+        const d = document.body.classList.contains("dark");
+        localStorage.setItem("theme", d ? "dark" : "light");
+        document.getElementById("themeToggle").textContent = d ? "☀️" : "🌙";
+      });
+
+      function renderSidebar() {
+        const nav = document.getElementById("sidebarNav");
+        const pLinks = [
+          { icon: "📊", label: "Dashboard", href: "dashboard.html" },
+          { icon: "📈", label: "Progress", href: "progress.html" },
+          { icon: "🏋️", label: "Exercises", href: "exercises.html" },
+          { icon: "📅", label: "Appointments", href: "appointments.html" },
+          { icon: "👤", label: "Profile", href: "profile.html" },
+        ];
+        const dLinks = [
+          { icon: "📊", label: "Dashboard", href: "dashboard.html" },
+          { icon: "👥", label: "Patients", href: "progress.html" },
+          { icon: "🏋️", label: "Exercises", href: "exercises.html" },
+          { icon: "📅", label: "Appointments", href: "appointments.html" },
+          { icon: "👤", label: "Profile", href: "profile.html" },
+        ];
+        const links = user.role === "doctor" ? dLinks : pLinks;
+        const cur = window.location.pathname.split("/").pop();
+        nav.innerHTML = links
+          .map(
+            (l) =>
+              `<a class="sidebar-link ${cur === l.href ? "active" : ""}" href="${l.href}"><span class="sidebar-link-icon">${l.icon}</span>${l.label}</a>`,
+          )
+          .join("");
+        document.getElementById("sidebarAvatar").textContent = user.name
+          ? user.name
+              .split(" ")
+              .map((w) => w[0])
+              .join("")
+              .toUpperCase()
+              .slice(0, 2)
+          : "--";
+        document.getElementById("sidebarName").textContent = user.name;
+        document.getElementById("sidebarRole").textContent = user.role;
+      }
+      renderSidebar();
+      document
+        .getElementById("mobileToggle")
+        .addEventListener("click", () =>
+          document.getElementById("sidebar").classList.toggle("open"),
+        );
+      document.getElementById("logoutBtn").addEventListener("click", () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.href = "login.html";
+      });
+
+      let allExercises = [];
+      let currentFilter = "all";
+      let editingId = null;
+
+      // Doctor: show create button
+      if (user.role === "doctor") {
+        document.getElementById("doctorActions").innerHTML =
+          '<button class="btn btn-primary" onclick="openModal()">＋ Create Exercise</button>';
+      }
+
+      async function loadExercises() {
+        try {
+          allExercises = await api("/exercises");
+          renderExercises(allExercises);
+        } catch (err) {
+          document.getElementById("exercisesGrid").innerHTML =
+            '<div class="empty-state"><div class="empty-state-icon">🏋️</div><p>Failed to load exercises.</p></div>';
+        }
+      }
+
+      function renderExercises(exercises) {
+        const grid = document.getElementById("exercisesGrid");
+        if (!exercises || exercises.length === 0) {
+          grid.innerHTML =
+            '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🏋️</div><p>No exercises found.</p></div>';
+          return;
+        }
+        const iconMap = {
+          stretching: "🧘",
+          strengthening: "💪",
+          balance: "⚖️",
+          cardio: "🏃",
+          flexibility: "🤸",
+          mobility: "🦵",
+          other: "🏋️",
+        };
+        grid.innerHTML = exercises
+          .map(
+            (ex) => `
+        <div class="exercise-card" data-category="${ex.category}">
+          <div class="exercise-card-top">
+            <div class="exercise-icon ${ex.category}">${iconMap[ex.category] || "🏋️"}</div>
+            <span class="exercise-diff ${ex.difficulty}">${ex.difficulty}</span>
+          </div>
+          <h3>${ex.title}</h3>
+          <div class="exercise-meta">
+            <span>⏱ ${ex.duration} min</span>
+            <span>📂 ${ex.category}</span>
+            ${ex.createdBy?.name ? `<span>👤 ${ex.createdBy.name}</span>` : ""}
+          </div>
+          <p>${ex.instructions}</p>
+          <div class="exercise-actions">
+            ${
+              user.role === "doctor"
+                ? `
+              <button class="btn btn-sm btn-ghost" onclick="editExercise('${ex._id}')">✏️ Edit</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteExercise('${ex._id}')">🗑️ Delete</button>
+            `
+                : `
+              <button class="btn btn-sm btn-primary" onclick="showToast('Exercise noted! Log completion in Progress.','success')">✅ Mark Complete</button>
+            `
+            }
+          </div>
+        </div>
+      `,
+          )
+          .join("");
+      }
+
+      function filterExercises(category, el) {
+        currentFilter = category;
+        document
+          .querySelectorAll(".filter-chip")
+          .forEach((c) => c.classList.remove("active"));
+        el.classList.add("active");
+        if (category === "all") renderExercises(allExercises);
+        else
+          renderExercises(allExercises.filter((e) => e.category === category));
+      }
+
+      function openModal(exercise = null) {
+        editingId = exercise ? exercise._id : null;
+        document.getElementById("modalTitle").textContent = exercise
+          ? "Edit Exercise"
+          : "Create Exercise";
+        document.getElementById("modalSubmitBtn").textContent = exercise
+          ? "Save Changes"
+          : "Create Exercise";
+        document.getElementById("exTitle").value = exercise
+          ? exercise.title
+          : "";
+        document.getElementById("exCategory").value = exercise
+          ? exercise.category
+          : "stretching";
+        document.getElementById("exDuration").value = exercise
+          ? exercise.duration
+          : 15;
+        document.getElementById("exDifficulty").value = exercise
+          ? exercise.difficulty
+          : "beginner";
+        document.getElementById("exInstructions").value = exercise
+          ? exercise.instructions
+          : "";
+        document.getElementById("exerciseModal").classList.add("open");
+      }
+      function closeModal() {
+        document.getElementById("exerciseModal").classList.remove("open");
+        editingId = null;
+      }
+
+      document
+        .getElementById("exerciseForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const body = {
+            title: document.getElementById("exTitle").value,
+            category: document.getElementById("exCategory").value,
+            duration: parseInt(document.getElementById("exDuration").value),
+            difficulty: document.getElementById("exDifficulty").value,
+            instructions: document.getElementById("exInstructions").value,
+          };
+          try {
+            if (editingId) {
+              await api(`/exercises/${editingId}`, {
+                method: "PUT",
+                body: JSON.stringify(body),
+              });
+              showToast("Exercise updated!", "success");
+            } else {
+              await api("/exercises", {
+                method: "POST",
+                body: JSON.stringify(body),
+              });
+              showToast("Exercise created!", "success");
+            }
+            closeModal();
+            loadExercises();
+          } catch (err) {
+            showToast(err.message);
+          }
+        });
+
+      function editExercise(id) {
+        const ex = allExercises.find((e) => e._id === id);
+        if (ex) openModal(ex);
+      }
+      async function deleteExercise(id) {
+        if (!confirm("Delete this exercise?")) return;
+        try {
+          await api(`/exercises/${id}`, { method: "DELETE" });
+          showToast("Exercise deleted!", "success");
+          loadExercises();
+        } catch (err) {
+          showToast(err.message);
+        }
+      }
+
+      document
+        .getElementById("exerciseModal")
+        .addEventListener("click", (e) => {
+          if (e.target === document.getElementById("exerciseModal"))
+            closeModal();
+        });
+
+      loadExercises();
+    </script>
+  </body>
+</html>
