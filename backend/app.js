@@ -1,8 +1,8 @@
-// ============================================================
+
 // app.js — Main Backend Server
 // Rehabilitation & Recovery Progress Tracker
 // Routes + Controllers + Middleware (Single File Architecture)
-// ============================================================
+
 
 require('dotenv').config();
 const express = require('express');
@@ -16,10 +16,10 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ── Connect to Database ───────────────────────────────────────
+// Connect to Database 
 connectDB();
 
-// ── Global Middleware ─────────────────────────────────────────
+// Global Middleware
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// ── Gemini AI Setup ───────────────────────────────────────────
+// Gemini AI Setup 
 let genAI;
 let geminiModel;
 try {
@@ -37,9 +37,9 @@ try {
   console.warn('⚠️  Gemini AI not configured. Chat will return fallback responses.');
 }
 
-// ============================================================
+
 // MIDDLEWARE
-// ============================================================
+
 
 /**
  * authMiddleware — Verifies JWT token from Authorization header.
@@ -79,9 +79,8 @@ const roleMiddleware = (...roles) => {
   };
 };
 
-// ============================================================
+
 // AUTH ROUTES
-// ============================================================
 
 /**
  * POST /api/register
@@ -175,9 +174,8 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ============================================================
+
 // PROFILE ROUTES
-// ============================================================
 
 /**
  * GET /api/profile
@@ -238,10 +236,7 @@ app.put('/api/profile', authMiddleware, async (req, res) => {
   }
 });
 
-// ============================================================
 // DASHBOARD ROUTE
-// ============================================================
-
 /**
  * GET /api/dashboard
  * Returns aggregated dashboard data based on user role
@@ -303,9 +298,8 @@ app.get('/api/dashboard', authMiddleware, async (req, res) => {
   }
 });
 
-// ============================================================
+
 // EXERCISE ROUTES
-// ============================================================
 
 /**
  * POST /api/exercises
@@ -409,9 +403,7 @@ app.delete('/api/exercises/:id', authMiddleware, roleMiddleware('doctor'), async
   }
 });
 
-// ============================================================
 // PROGRESS ROUTES
-// ============================================================
 
 /**
  * POST /api/progress
@@ -482,9 +474,7 @@ app.get('/api/progress', authMiddleware, async (req, res) => {
   }
 });
 
-// ============================================================
 // APPOINTMENT ROUTES
-// ============================================================
 
 /**
  * POST /api/appointments
@@ -603,9 +593,7 @@ app.get('/api/patients', authMiddleware, roleMiddleware('doctor'), async (req, r
   }
 });
 
-// ============================================================
 // CHAT ROUTES (GEMINI AI INTEGRATION)
-// ============================================================
 
 /**
  * POST /api/chat
@@ -695,17 +683,14 @@ app.get('/api/chat', authMiddleware, async (req, res) => {
   }
 });
 
-// ============================================================
+
 // HEALTH CHECK
-// ============================================================
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// ============================================================
 // START SERVER
-// ============================================================
 
 app.listen(PORT, () => {
   console.log(`
