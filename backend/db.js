@@ -1,11 +1,9 @@
-// ============================================================
 // db.js — MongoDB Atlas Connection & Mongoose Schemas
 // Rehabilitation & Recovery Progress Tracker
-// ============================================================
 
 const mongoose = require('mongoose');
 
-// ── Connect to MongoDB Atlas ──────────────────────────────────
+// Connect to MongoDB Atlas 
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
@@ -16,7 +14,7 @@ const connectDB = async () => {
   }
 };
 
-// ── User Schema ───────────────────────────────────────────────
+// User Schema 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -72,7 +70,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// ── Exercise Schema ───────────────────────────────────────────
+// Exercise Schema 
 const exerciseSchema = new mongoose.Schema({
   title: {
     type: String,
@@ -115,7 +113,7 @@ const exerciseSchema = new mongoose.Schema({
 
 const Exercise = mongoose.model('Exercise', exerciseSchema);
 
-// ── Progress Schema ───────────────────────────────────────────
+// Progress Schema 
 const progressSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -156,7 +154,7 @@ const progressSchema = new mongoose.Schema({
 
 const Progress = mongoose.model('Progress', progressSchema);
 
-// ── Appointment Schema ────────────────────────────────────────
+// Appointment Schema 
 const appointmentSchema = new mongoose.Schema({
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -193,7 +191,7 @@ const appointmentSchema = new mongoose.Schema({
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
-// ── Chat Schema ───────────────────────────────────────────────
+// Chat Schema
 const chatSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -219,7 +217,7 @@ const chatSchema = new mongoose.Schema({
 
 const Chat = mongoose.model('Chat', chatSchema);
 
-// ── Export ─────────────────────────────────────────────────────
+// Export
 module.exports = {
   connectDB,
   User,
