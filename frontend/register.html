@@ -290,6 +290,30 @@
       .form-input.error + .form-error {
         display: block;
       }
+      .password-wrapper {
+        position: relative;
+      }
+      .password-wrapper .form-input {
+        padding-right: 44px;
+      }
+      .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--on-surface-variant);
+        font-size: 16px;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        transition: color var(--transition);
+      }
+      .password-toggle:hover {
+        color: var(--primary);
+      }
 
       .role-selector {
         display: flex;
@@ -583,13 +607,16 @@
 
           <div class="form-group">
             <label class="form-label" for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              class="form-input"
-              placeholder="Min. 6 characters"
-              required
-            />
+            <div class="password-wrapper">
+              <input
+                type="password"
+                id="password"
+                class="form-input"
+                placeholder="Min. 6 characters"
+                required
+              />
+              <button type="button" class="password-toggle" tabindex="-1" aria-label="Show password">👁️</button>
+            </div>
             <div class="password-strength">
               <div class="password-strength-fill" id="strengthFill"></div>
             </div>
@@ -602,13 +629,16 @@
             <label class="form-label" for="confirmPassword"
               >Confirm Password</label
             >
-            <input
-              type="password"
-              id="confirmPassword"
-              class="form-input"
-              placeholder="••••••••"
-              required
-            />
+            <div class="password-wrapper">
+              <input
+                type="password"
+                id="confirmPassword"
+                class="form-input"
+                placeholder="••••••••"
+                required
+              />
+              <button type="button" class="password-toggle" tabindex="-1" aria-label="Show password">👁️</button>
+            </div>
             <div class="form-error">Passwords do not match.</div>
           </div>
 
@@ -635,6 +665,20 @@
           document.getElementById("themeToggle").textContent = "☀️";
         }
       })();
+
+      document.querySelectorAll('.password-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const input = btn.previousElementSibling;
+          if (input.type === 'password') {
+            input.type = 'text';
+            btn.textContent = '🙈';
+          } else {
+            input.type = 'password';
+            btn.textContent = '👁️';
+          }
+        });
+      });
+
       document.getElementById("themeToggle").addEventListener("click", () => {
         document.body.classList.toggle("dark");
         const isDark = document.body.classList.contains("dark");

@@ -299,6 +299,30 @@
         border-color: rgba(173, 199, 255, 0.3);
         box-shadow: 0 0 0 4px rgba(173, 199, 255, 0.08);
       }
+      .password-wrapper {
+        position: relative;
+      }
+      .password-wrapper .form-input {
+        padding-right: 44px;
+      }
+      .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--on-surface-variant);
+        font-size: 16px;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        transition: color var(--transition);
+      }
+      .password-toggle:hover {
+        color: var(--primary);
+      }
       .form-input.error {
         border-color: var(--error);
       }
@@ -545,14 +569,17 @@
 
           <div class="form-group">
             <label class="form-label" for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              class="form-input"
-              placeholder="••••••••"
-              required
-              autocomplete="current-password"
-            />
+            <div class="password-wrapper">
+              <input
+                type="password"
+                id="password"
+                class="form-input"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+              />
+              <button type="button" class="password-toggle" tabindex="-1" aria-label="Show password">👁️</button>
+            </div>
             <div class="form-error">Password is required.</div>
           </div>
 
@@ -578,6 +605,19 @@
           document.getElementById("themeToggle").textContent = "☀️";
         }
       })();
+
+      document.querySelectorAll('.password-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const input = btn.previousElementSibling;
+          if (input.type === 'password') {
+            input.type = 'text';
+            btn.textContent = '🙈';
+          } else {
+            input.type = 'password';
+            btn.textContent = '👁️';
+          }
+        });
+      });
 
       document.getElementById("themeToggle").addEventListener("click", () => {
         document.body.classList.toggle("dark");

@@ -222,6 +222,35 @@
         color: var(--on-surface-variant);
         text-transform: capitalize;
       }
+      .sidebar-logout-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        padding: 11px 16px;
+        margin-top: 12px;
+        border: none;
+        border-radius: var(--radius-md);
+        background: var(--error-container);
+        color: var(--error);
+        font-family: var(--font-body);
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all var(--transition);
+      }
+      .sidebar-logout-btn:hover {
+        filter: brightness(0.92);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+      }
+      body.dark .sidebar-logout-btn {
+        background: rgba(255, 180, 171, 0.1);
+        color: #ef9a9a;
+      }
+      body.dark .sidebar-logout-btn:hover {
+        background: rgba(255, 180, 171, 0.18);
+      }
       .main-content {
         flex: 1;
         margin-left: 260px;
@@ -275,6 +304,30 @@
       }
       .mobile-toggle {
         display: none;
+      }
+      .password-wrapper {
+        position: relative;
+      }
+      .password-wrapper .form-input {
+        padding-right: 44px;
+      }
+      .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--on-surface-variant);
+        font-size: 16px;
+        padding: 4px;
+        display: flex;
+        align-items: center;
+        transition: color var(--transition);
+      }
+      .password-toggle:hover {
+        color: var(--primary);
       }
       .content {
         flex: 1;
@@ -559,6 +612,10 @@
               <div class="sidebar-user-role" id="sidebarRole">—</div>
             </div>
           </div>
+          <button class="sidebar-logout-btn" id="logoutBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </button>
         </div>
       </aside>
       <main class="main-content">
@@ -581,9 +638,6 @@
               aria-label="Toggle dark mode"
             >
               🌙
-            </button>
-            <button class="topbar-btn" id="logoutBtn" aria-label="Logout">
-              🚪
             </button>
           </div>
         </header>
@@ -643,22 +697,28 @@
                 <form id="passwordForm" class="form-grid">
                   <div class="form-group">
                     <label class="form-label">Current Password</label>
-                    <input
-                      type="password"
-                      class="form-input"
-                      id="currentPassword"
-                      required
-                    />
+                    <div class="password-wrapper">
+                      <input
+                        type="password"
+                        class="form-input"
+                        id="currentPassword"
+                        required
+                      />
+                      <button type="button" class="password-toggle" tabindex="-1" aria-label="Show password">👁️</button>
+                    </div>
                   </div>
                   <div class="form-group">
                     <label class="form-label">New Password</label>
-                    <input
-                      type="password"
-                      class="form-input"
-                      id="newPassword"
-                      placeholder="Min. 6 characters"
-                      required
-                    />
+                    <div class="password-wrapper">
+                      <input
+                        type="password"
+                        class="form-input"
+                        id="newPassword"
+                        placeholder="Min. 6 characters"
+                        required
+                      />
+                      <button type="button" class="password-toggle" tabindex="-1" aria-label="Show password">👁️</button>
+                    </div>
                   </div>
                   <div class="form-group full" style="text-align: right">
                     <button type="submit" class="btn btn-primary">
@@ -676,6 +736,20 @@
 
     <script>
       const API_BASE = window.location.origin + "/api";
+
+      document.querySelectorAll('.password-toggle').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const input = btn.previousElementSibling;
+          if (input.type === 'password') {
+            input.type = 'text';
+            btn.textContent = '🙈';
+          } else {
+            input.type = 'password';
+            btn.textContent = '👁️';
+          }
+        });
+      });
+
       function getToken() {
         return localStorage.getItem("token");
       }
