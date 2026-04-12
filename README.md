@@ -12,7 +12,7 @@ A premium rehabilitation and recovery progress tracking platform for patients an
 ## Tech Stack
 - **Frontend**: HTML5, Vanilla CSS, JavaScript.
 - **Backend**: Node.js, Express.
-- **Database**: PostgreSQL (Prisma ORM).
+- **Database**: MongoDB.
 - **AI**: Google Gemini.
 
 ## Getting Started
