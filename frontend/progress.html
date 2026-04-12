@@ -280,8 +280,6 @@
         flex: 1;
         padding: 0 32px 32px;
       }
-
-      /* ── Page Specific ─────────────────────────────── */
       .page-actions {
         display: flex;
         align-items: center;
@@ -354,8 +352,6 @@
         width: 100% !important;
         height: 100% !important;
       }
-
-      /* ── Log Form ──────────────────────────────────── */
       .form-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -477,8 +473,6 @@
       .mood-option input {
         display: none;
       }
-
-      /* ── Progress Table ────────────────────────────── */
       .table-wrap {
         overflow-x: auto;
       }
@@ -521,8 +515,6 @@
       .pain-high {
         background: #e53935;
       }
-
-      /* ── Patient Selector (Doctor) ──────────────────── */
       .patient-selector {
         margin-bottom: 24px;
       }
@@ -537,8 +529,6 @@
         outline: none;
         min-width: 240px;
       }
-
-      /* ── Toast ──────────────────────────────────────── */
       .toast-container {
         position: fixed;
         top: 24px;
@@ -806,8 +796,6 @@
         if (user.role === "patient") renderPatientProgress(content);
         else renderDoctorProgress(content);
       }
-
-      // ── Patient: Log Progress + View History ──────────
       async function renderPatientProgress(container) {
         container.innerHTML = `
         <div class="page-actions">
@@ -1030,8 +1018,6 @@
           .trim();
         ctx.fillText("- - Pain Level (×10)", pad.left + 120, pad.top - 4);
       }
-
-      // ── Doctor: View patient progress ─────────────────
       async function renderDoctorProgress(container) {
         document.getElementById("pageSubtitle").textContent =
           "View patient progress data";

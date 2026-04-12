@@ -96,14 +96,10 @@
         text-decoration: none;
         color: inherit;
       }
-
-      /* ── Layout ─────────────────────────────────────── */
       .app-layout {
         display: flex;
         min-height: 100vh;
       }
-
-      /* ── Sidebar ────────────────────────────────────── */
       .sidebar {
         width: 260px;
         background: var(--surface-container-low);
@@ -226,8 +222,6 @@
         color: var(--on-surface-variant);
         text-transform: capitalize;
       }
-
-      /* ── Main Content ──────────────────────────────── */
       .main-content {
         flex: 1;
         margin-left: 260px;
@@ -235,8 +229,6 @@
         flex-direction: column;
         min-height: 100vh;
       }
-
-      /* ── Top Bar ────────────────────────────────────── */
       .topbar {
         padding: 16px 32px;
         display: flex;
@@ -284,14 +276,10 @@
       .mobile-toggle {
         display: none;
       }
-
-      /* ── Content Area ──────────────────────────────── */
       .content {
         flex: 1;
         padding: 0 32px 32px;
       }
-
-      /* ── Stats Grid ────────────────────────────────── */
       .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -389,8 +377,6 @@
         text-transform: uppercase;
         letter-spacing: 0.04em;
       }
-
-      /* ── Cards Grid ────────────────────────────────── */
       .cards-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -427,8 +413,6 @@
       .card-action:hover {
         text-decoration: underline;
       }
-
-      /* ── List Items ─────────────────────────────────── */
       .list-item {
         display: flex;
         align-items: center;
@@ -529,8 +513,6 @@
         background: #3c1111;
         color: #ef9a9a;
       }
-
-      /* ── Progress Chart Canvas ─────────────────────── */
       .chart-container {
         position: relative;
         height: 200px;
@@ -540,8 +522,6 @@
         width: 100% !important;
         height: 100% !important;
       }
-
-      /* ── Empty State ────────────────────────────────── */
       .empty-state {
         text-align: center;
         padding: 40px 20px;
@@ -555,8 +535,6 @@
       .empty-state p {
         font-size: 0.85rem;
       }
-
-      /* ── Loading Skeleton ──────────────────────────── */
       .skeleton {
         background: linear-gradient(
           90deg,
@@ -585,8 +563,6 @@
         width: 60%;
         margin-bottom: 16px;
       }
-
-      /* ── Chatbot ────────────────────────────────────── */
       .chatbot-fab {
         position: fixed;
         bottom: 28px;
@@ -805,8 +781,6 @@
       .chatbot-input button:hover {
         transform: scale(1.05);
       }
-
-      /* ── Toast ──────────────────────────────────────── */
       .toast-container {
         position: fixed;
         top: 24px;
@@ -854,8 +828,6 @@
           opacity: 1;
         }
       }
-
-      /* ── Modal ──────────────────────────────────────── */
       .modal-overlay {
         position: fixed;
         inset: 0;
@@ -890,8 +862,6 @@
         color: var(--on-surface-variant);
         margin-bottom: 24px;
       }
-
-      /* ── Responsive ─────────────────────────────────── */
       @media (max-width: 1024px) {
         .stats-grid {
           grid-template-columns: repeat(2, 1fr);
@@ -937,7 +907,6 @@
     </style>
   </head>
   <body>
-    <!-- ── Sidebar ─────────────────────────────────────── -->
     <div class="app-layout">
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -958,7 +927,6 @@
       </aside>
 
       <main class="main-content">
-        <!-- ── Top Bar ──────────────────────────────────── -->
         <header class="topbar">
           <div class="topbar-left">
             <button
@@ -989,8 +957,6 @@
             </button>
           </div>
         </header>
-
-        <!-- ── Content ──────────────────────────────────── -->
         <div class="content" id="dashboardContent">
           <!-- Stats will be injected here -->
           <div class="stats-grid" id="statsGrid">
@@ -1026,8 +992,6 @@
         </div>
       </main>
     </div>
-
-    <!-- ── Chatbot ──────────────────────────────────────── -->
     <button
       class="chatbot-fab"
       id="chatbotFab"
@@ -1066,9 +1030,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-      // ============================================================
       // CORE UTILITIES
-      // ============================================================
       const API_BASE = window.location.origin + "/api";
 
       function getToken() {
@@ -1122,19 +1084,13 @@
           year: "numeric",
         });
       }
-
-      // ============================================================
       // AUTH CHECK
-      // ============================================================
       const token = getToken();
       const user = getUser();
       if (!token || !user) {
         window.location.href = "login.html";
       }
-
-      // ============================================================
       // THEME
-      // ============================================================
       (function () {
         if (localStorage.getItem("theme") === "dark") {
           document.body.classList.add("dark");
@@ -1149,10 +1105,7 @@
           ? "☀️"
           : "🌙";
       });
-
-      // ============================================================
       // SIDEBAR
-      // ============================================================
       function renderSidebar() {
         const nav = document.getElementById("sidebarNav");
         const patientLinks = [
@@ -1196,22 +1149,15 @@
         document.getElementById("sidebarRole").textContent = user.role || "—";
       }
       renderSidebar();
-
-      // ── Mobile Sidebar Toggle ─────────────────────────
       document.getElementById("mobileToggle").addEventListener("click", () => {
         document.getElementById("sidebar").classList.toggle("open");
       });
-
-      // ── Logout ────────────────────────────────────────
       document.getElementById("logoutBtn").addEventListener("click", () => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         window.location.href = "login.html";
       });
-
-      // ============================================================
       // DASHBOARD DATA
-      // ============================================================
       async function loadDashboard() {
         try {
           const data = await api("/dashboard");
@@ -1225,8 +1171,6 @@
           renderFallbackDashboard();
         }
       }
-
-      // ── Patient Dashboard ──────────────────────────────
       function renderPatientDashboard(data) {
         const s = data.stats;
 
@@ -1341,8 +1285,6 @@
           drawChart(data.recentProgress.reverse());
         }
       }
-
-      // ── Doctor Dashboard ───────────────────────────────
       function renderDoctorDashboard(data) {
         const s = data.stats;
 
@@ -1447,8 +1389,6 @@
         <div class="card"><div class="empty-state"><div class="empty-state-icon">🚀</div><p>Connect your backend to see live data!</p></div></div>
       `;
       }
-
-      // ── Simple Canvas Chart ────────────────────────────
       function drawChart(progressData) {
         const canvas = document.getElementById("progressChart");
         if (!canvas) return;
@@ -1556,10 +1496,7 @@
       }
 
       loadDashboard();
-
-      // ============================================================
       // CHATBOT
-      // ============================================================
       const chatFab = document.getElementById("chatbotFab");
       const chatWindow = document.getElementById("chatbotWindow");
       const chatClose = document.getElementById("chatbotClose");

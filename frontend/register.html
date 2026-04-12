@@ -629,8 +629,6 @@
     <script>
       const API_BASE = window.location.origin + "/api";
       let selectedRole = "patient";
-
-      // ── Theme ─────────────────────────────────────────
       (function () {
         if (localStorage.getItem("theme") === "dark") {
           document.body.classList.add("dark");
@@ -648,8 +646,6 @@
 
       if (localStorage.getItem("token"))
         window.location.href = "dashboard.html";
-
-      // ── Role Selection ────────────────────────────────
       function selectRole(role) {
         selectedRole = role;
         document
@@ -659,8 +655,6 @@
           document.getElementById("rolePatient").classList.add("active");
         else document.getElementById("roleDoctor").classList.add("active");
       }
-
-      // ── Password Strength ─────────────────────────────
       document.getElementById("password").addEventListener("input", (e) => {
         const val = e.target.value;
         const fill = document.getElementById("strengthFill");
@@ -678,8 +672,6 @@
         else if (strength <= 3) fill.style.background = "#fdd835";
         else fill.style.background = "#43a047";
       });
-
-      // ── Toast ─────────────────────────────────────────
       function showToast(message, type = "error") {
         const container = document.getElementById("toastContainer");
         const toast = document.createElement("div");
@@ -691,8 +683,6 @@
           setTimeout(() => toast.remove(), 300);
         }, 4000);
       }
-
-      // ── Form Submission ───────────────────────────────
       document
         .getElementById("registerForm")
         .addEventListener("submit", async (e) => {

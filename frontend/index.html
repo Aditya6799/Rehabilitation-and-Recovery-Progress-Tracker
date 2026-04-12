@@ -14,7 +14,6 @@
       rel="stylesheet"
     />
     <style>
-      /* ── Design Tokens ─────────────────────────────────── */
       :root {
         --primary: #0059bb;
         --primary-container: #0070ea;
@@ -91,8 +90,6 @@
         --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
         --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.45);
       }
-
-      /* ── Reset & Base ──────────────────────────────────── */
       *,
       *::before,
       *::after {
@@ -124,8 +121,6 @@
         max-width: 100%;
         display: block;
       }
-
-      /* ── Navigation ────────────────────────────────────── */
       .nav {
         position: fixed;
         top: 0;
@@ -274,8 +269,6 @@
         background: var(--surface-container-high);
         color: var(--primary);
       }
-
-      /* ── Hero Section ──────────────────────────────────── */
       .hero {
         min-height: 100vh;
         display: flex;
@@ -594,8 +587,6 @@
           transform: translateY(-10px);
         }
       }
-
-      /* ── Features Section ──────────────────────────────── */
       .section {
         padding: 100px 48px;
         max-width: 1200px;
@@ -741,8 +732,6 @@
         color: var(--on-surface-variant);
         line-height: 1.6;
       }
-
-      /* ── How It Works ──────────────────────────────────── */
       .steps-grid {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
@@ -786,8 +775,6 @@
         color: var(--on-surface-variant);
         line-height: 1.6;
       }
-
-      /* ── Roles Section ─────────────────────────────────── */
       .roles-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -894,8 +881,6 @@
         color: var(--primary);
         flex-shrink: 0;
       }
-
-      /* ── CTA Section ───────────────────────────────────── */
       .cta-section {
         text-align: center;
         padding: 100px 48px;
@@ -965,8 +950,6 @@
         transform: translateY(-2px);
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
       }
-
-      /* ── Footer ────────────────────────────────────────── */
       .footer {
         padding: 60px 48px 30px;
         background: var(--surface-container-low);
@@ -1036,13 +1019,9 @@
         font-size: 0.75rem;
         color: var(--on-surface-variant);
       }
-
-      /* ── Mobile Nav Toggle ─────────────────────────────── */
       .nav-toggle {
         display: none;
       }
-
-      /* ── Responsive ────────────────────────────────────── */
       @media (max-width: 1024px) {
         .hero-content {
           grid-template-columns: 1fr;
@@ -1151,8 +1130,6 @@
           display: none;
         }
       }
-
-      /* ── Entrance Animations ───────────────────────────── */
       .fade-up {
         opacity: 0;
         transform: translateY(30px);
@@ -1168,7 +1145,6 @@
     </style>
   </head>
   <body>
-    <!-- ── Navigation ──────────────────────────────────── -->
     <nav class="nav" id="mainNav">
       <a href="index.html" class="nav-logo">
         <div class="nav-logo-icon">⚕</div>
@@ -1194,8 +1170,6 @@
         <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
       </div>
     </nav>
-
-    <!-- ── Hero ────────────────────────────────────────── -->
     <section class="hero">
       <div class="hero-bg"></div>
       <div class="hero-content">
@@ -1307,8 +1281,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ── Features ────────────────────────────────────── -->
     <section class="section" id="features">
       <div class="fade-up">
         <div class="section-label">Platform Features</div>
@@ -1371,8 +1343,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ── How It Works ────────────────────────────────── -->
     <section
       class="section"
       id="how-it-works"
@@ -1418,8 +1388,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ── Roles ───────────────────────────────────────── -->
     <section class="section" id="roles">
       <div class="fade-up">
         <div class="section-label">Built For You</div>
@@ -1463,8 +1431,6 @@
         </div>
       </div>
     </section>
-
-    <!-- ── CTA ─────────────────────────────────────────── -->
     <section class="cta-section">
       <div class="cta-card fade-up">
         <h2>Ready to Begin Your Recovery?</h2>
@@ -1475,8 +1441,6 @@
         <a href="register.html" class="btn-white">Create Free Account →</a>
       </div>
     </section>
-
-    <!-- ── Footer ──────────────────────────────────────── -->
     <footer class="footer">
       <div class="footer-content">
         <div class="footer-brand">
@@ -1519,7 +1483,6 @@
     </footer>
 
     <script>
-      /* ── Theme Toggle ────────────────────────────────── */
       (function () {
         const theme = localStorage.getItem("theme");
         if (theme === "dark") document.body.classList.add("dark");
@@ -1537,20 +1500,14 @@
       if (localStorage.getItem("theme") === "dark") {
         document.getElementById("themeToggle").textContent = "☀️";
       }
-
-      /* ── Nav Scroll ──────────────────────────────────── */
       window.addEventListener("scroll", () => {
         document
           .getElementById("mainNav")
           .classList.toggle("scrolled", window.scrollY > 20);
       });
-
-      /* ── Mobile Nav ──────────────────────────────────── */
       document.getElementById("navToggle").addEventListener("click", () => {
         document.getElementById("navLinks").classList.toggle("open");
       });
-
-      /* ── Intersection Observer for Animations ────────── */
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {

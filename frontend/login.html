@@ -102,8 +102,6 @@
           background var(--transition),
           color var(--transition);
       }
-
-      /* ── Left Panel (Decorative) ──────────────────────── */
       .auth-panel-left {
         flex: 1;
         display: flex;
@@ -204,8 +202,6 @@
         font-size: 16px;
         flex-shrink: 0;
       }
-
-      /* ── Right Panel (Form) ───────────────────────────── */
       .auth-panel-right {
         flex: 1;
         display: flex;
@@ -270,8 +266,6 @@
         color: var(--on-surface-variant);
         margin-bottom: 36px;
       }
-
-      /* ── Form Elements ────────────────────────────────── */
       .form-group {
         margin-bottom: 20px;
       }
@@ -317,8 +311,6 @@
       .form-input.error + .form-error {
         display: block;
       }
-
-      /* ── Role Selector ────────────────────────────────── */
       .role-selector {
         display: flex;
         gap: 12px;
@@ -356,8 +348,6 @@
       .role-option input {
         display: none;
       }
-
-      /* ── Submit Button ─────────────────────────────────── */
       .btn-submit {
         width: 100%;
         padding: 14px;
@@ -427,8 +417,6 @@
       .form-footer a:hover {
         text-decoration: underline;
       }
-
-      /* ── Toast ─────────────────────────────────────────── */
       .toast-container {
         position: fixed;
         top: 24px;
@@ -476,8 +464,6 @@
           opacity: 1;
         }
       }
-
-      /* ── Responsive ────────────────────────────────────── */
       @media (max-width: 768px) {
         body {
           flex-direction: column;
@@ -497,7 +483,6 @@
     </style>
   </head>
   <body>
-    <!-- ── Left Panel ──────────────────────────────────── -->
     <div class="auth-panel-left">
       <div class="auth-left-content">
         <div class="auth-left-logo">⚕</div>
@@ -526,8 +511,6 @@
         </div>
       </div>
     </div>
-
-    <!-- ── Right Panel (Form) ──────────────────────────── -->
     <div class="auth-panel-right">
       <div class="auth-top-bar">
         <button
@@ -588,10 +571,7 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-      // ── API Base URL ─────────────────────────────────────
       const API_BASE = window.location.origin + "/api";
-
-      // ── Theme Toggle ─────────────────────────────────────
       (function () {
         if (localStorage.getItem("theme") === "dark") {
           document.body.classList.add("dark");
@@ -607,13 +587,9 @@
           ? "☀️"
           : "🌙";
       });
-
-      // ── If already logged in, redirect ───────────────────
       if (localStorage.getItem("token")) {
         window.location.href = "dashboard.html";
       }
-
-      // ── Toast Utility ────────────────────────────────────
       function showToast(message, type = "error") {
         const container = document.getElementById("toastContainer");
         const toast = document.createElement("div");
@@ -625,8 +601,6 @@
           setTimeout(() => toast.remove(), 300);
         }, 4000);
       }
-
-      // ── Form Validation & Submission ─────────────────────
       document
         .getElementById("loginForm")
         .addEventListener("submit", async (e) => {
@@ -687,8 +661,6 @@
             submitBtn.disabled = false;
           }
         });
-
-      // ── Remove error on input ────────────────────────────
       document.querySelectorAll(".form-input").forEach((input) => {
         input.addEventListener("input", () => input.classList.remove("error"));
       });
