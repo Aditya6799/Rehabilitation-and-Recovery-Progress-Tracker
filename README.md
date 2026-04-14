@@ -20,5 +20,5 @@ A premium rehabilitation and recovery progress tracking platform for patients an
 2. Navigate to the `backend` directory.
 3. Install dependencies: `npm install`.
 4. Set up your `.env` file with necessary credentials.
-5. Start the server: `npm run dev` or `node app.js`.
+5. Start the server: `npm start` or `node server.js`.
 6. Open the frontend in your browser.
