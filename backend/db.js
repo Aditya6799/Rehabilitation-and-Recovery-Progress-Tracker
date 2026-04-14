@@ -100,6 +100,10 @@ const exerciseSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  videoUrl: {
+    type: String,
+    default: ''
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

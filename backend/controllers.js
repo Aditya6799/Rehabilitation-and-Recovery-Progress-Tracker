@@ -1,33 +1,8 @@
-
-// app.js — Main Backend Server
-// Rehabilitation & Recovery Progress Tracker
-// Routes + Controllers + Middleware (Single File Architecture)
-
-
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { connectDB, User, Exercise, Progress, Appointment, Chat } = require('./db');
-const path = require('path');
+const { User, Exercise, Progress, Appointment, Chat } = require('./db');
 
-const app = express();
-const PORT = process.env.PORT || 5000;
-
-// Connect to Database 
-connectDB();
-
-// Global Middleware
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
-
-// Serve frontend static files
-app.use(express.static(path.join(__dirname, '../frontend')));
-
-// Gemini AI Setup 
 let genAI;
 let geminiModel;
 try {
@@ -37,60 +12,11 @@ try {
   console.warn('⚠️  Gemini AI not configured. Chat will return fallback responses.');
 }
 
-
-// MIDDLEWARE
-
-
-/**
- * authMiddleware — Verifies JWT token from Authorization header.
- * Attaches decoded user data (id, role) to req.user.
- */
-const authMiddleware = (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Access denied. No token provided.' });
-    }
-
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired. Please login again.' });
-    }
-    return res.status(401).json({ error: 'Invalid token.' });
-  }
-};
-
-/**
- * roleMiddleware — Checks if the authenticated user has the required role.
- * @param  {...string} roles - Allowed roles (e.g., 'doctor', 'patient')
- */
-const roleMiddleware = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user || !roles.includes(req.user.role)) {
-      return res.status(403).json({
-        error: `Access denied. This action requires one of the following roles: ${roles.join(', ')}`
-      });
-    }
-    next();
-  };
-};
-
-
-// AUTH ROUTES
-
-/**
- * POST /api/register
- * Register a new user (patient or doctor)
- */
-app.post('/api/register', async (req, res) => {
+// --- AUTH ---
+exports.register = async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
 
-    // Validation
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: 'All fields are required.' });
     }
@@ -101,17 +27,14 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ error: 'Password must be at least 6 characters.' });
     }
 
-    // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'An account with this email already exists.' });
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
     const user = await User.create({
       name,
       email,
@@ -130,13 +53,9 @@ app.post('/api/register', async (req, res) => {
     }
     res.status(500).json({ error: 'Server error during registration.' });
   }
-});
+};
 
-/**
- * POST /api/login
- * Authenticate user and return JWT token
- */
-app.post('/api/login', async (req, res) => {
+exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -144,19 +63,16 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required.' });
     }
 
-    // Find user
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).json({ error: 'Invalid email or password.' });
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ error: 'Invalid email or password.' });
     }
 
-    // Generate JWT
     const token = jwt.sign(
       { id: user._id, email: user.email, role: user.role, name: user.name },
       process.env.JWT_SECRET,
@@ -172,16 +88,10 @@ app.post('/api/login', async (req, res) => {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Server error during login.' });
   }
-});
+};
 
-
-// PROFILE ROUTES
-
-/**
- * GET /api/profile
- * Get authenticated user's profile
- */
-app.get('/api/profile', authMiddleware, async (req, res) => {
+// --- PROFILE ---
+exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select('-password');
     if (!user) {
@@ -192,13 +102,9 @@ app.get('/api/profile', authMiddleware, async (req, res) => {
     console.error('Get profile error:', error);
     res.status(500).json({ error: 'Server error fetching profile.' });
   }
-});
+};
 
-/**
- * PUT /api/profile
- * Update authenticated user's profile
- */
-app.put('/api/profile', authMiddleware, async (req, res) => {
+exports.updateProfile = async (req, res) => {
   try {
     const allowedFields = ['name', 'phone', 'bio', 'specialization', 'licenseNumber', 'medicalHistory'];
     const updates = {};
@@ -209,7 +115,6 @@ app.put('/api/profile', authMiddleware, async (req, res) => {
       }
     });
 
-    // Handle password change
     if (req.body.currentPassword && req.body.newPassword) {
       const user = await User.findById(req.user.id);
       const isMatch = await bcrypt.compare(req.body.currentPassword, user.password);
@@ -234,14 +139,10 @@ app.put('/api/profile', authMiddleware, async (req, res) => {
     console.error('Update profile error:', error);
     res.status(500).json({ error: 'Server error updating profile.' });
   }
-});
+};
 
-// DASHBOARD ROUTE
-/**
- * GET /api/dashboard
- * Returns aggregated dashboard data based on user role
- */
-app.get('/api/dashboard', authMiddleware, async (req, res) => {
+// --- DASHBOARD ---
+exports.getDashboard = async (req, res) => {
   try {
     if (req.user.role === 'patient') {
       const [progressEntries, exercises, appointments, recentProgress] = await Promise.all([
@@ -296,18 +197,12 @@ app.get('/api/dashboard', authMiddleware, async (req, res) => {
     console.error('Dashboard error:', error);
     res.status(500).json({ error: 'Server error fetching dashboard data.' });
   }
-});
+};
 
-
-// EXERCISE ROUTES
-
-/**
- * POST /api/exercises
- * Create a new exercise (Doctor only)
- */
-app.post('/api/exercises', authMiddleware, roleMiddleware('doctor'), async (req, res) => {
+// --- EXERCISES ---
+exports.createExercise = async (req, res) => {
   try {
-    const { title, category, duration, difficulty, instructions, targetArea, assignedTo } = req.body;
+    const { title, category, duration, difficulty, instructions, targetArea, assignedTo, videoUrl } = req.body;
 
     if (!title || !category || !duration || !instructions) {
       return res.status(400).json({ error: 'Title, category, duration, and instructions are required.' });
@@ -320,6 +215,7 @@ app.post('/api/exercises', authMiddleware, roleMiddleware('doctor'), async (req,
       difficulty: difficulty || 'beginner',
       instructions,
       targetArea: targetArea || '',
+      videoUrl: videoUrl || '',
       createdBy: req.user.id,
       assignedTo: assignedTo || []
     });
@@ -329,13 +225,9 @@ app.post('/api/exercises', authMiddleware, roleMiddleware('doctor'), async (req,
     console.error('Create exercise error:', error);
     res.status(500).json({ error: 'Server error creating exercise.' });
   }
-});
+};
 
-/**
- * GET /api/exercises
- * Get exercises (all for doctors, assigned for patients)
- */
-app.get('/api/exercises', authMiddleware, async (req, res) => {
+exports.getExercises = async (req, res) => {
   try {
     let exercises;
     if (req.user.role === 'doctor') {
@@ -356,13 +248,9 @@ app.get('/api/exercises', authMiddleware, async (req, res) => {
     console.error('Get exercises error:', error);
     res.status(500).json({ error: 'Server error fetching exercises.' });
   }
-});
+};
 
-/**
- * PUT /api/exercises/:id
- * Update an exercise (Doctor only)
- */
-app.put('/api/exercises/:id', authMiddleware, roleMiddleware('doctor'), async (req, res) => {
+exports.updateExercise = async (req, res) => {
   try {
     const exercise = await Exercise.findOneAndUpdate(
       { _id: req.params.id, createdBy: req.user.id },
@@ -379,13 +267,9 @@ app.put('/api/exercises/:id', authMiddleware, roleMiddleware('doctor'), async (r
     console.error('Update exercise error:', error);
     res.status(500).json({ error: 'Server error updating exercise.' });
   }
-});
+};
 
-/**
- * DELETE /api/exercises/:id
- * Delete an exercise (Doctor only)
- */
-app.delete('/api/exercises/:id', authMiddleware, roleMiddleware('doctor'), async (req, res) => {
+exports.deleteExercise = async (req, res) => {
   try {
     const exercise = await Exercise.findOneAndDelete({
       _id: req.params.id,
@@ -401,15 +285,10 @@ app.delete('/api/exercises/:id', authMiddleware, roleMiddleware('doctor'), async
     console.error('Delete exercise error:', error);
     res.status(500).json({ error: 'Server error deleting exercise.' });
   }
-});
+};
 
-// PROGRESS ROUTES
-
-/**
- * POST /api/progress
- * Log progress (Patient only)
- */
-app.post('/api/progress', authMiddleware, roleMiddleware('patient'), async (req, res) => {
+// --- PROGRESS ---
+exports.logProgress = async (req, res) => {
   try {
     const { date, painLevel, exerciseCompletion, mood, notes, exercisesCompleted } = req.body;
 
@@ -432,15 +311,10 @@ app.post('/api/progress', authMiddleware, roleMiddleware('patient'), async (req,
     console.error('Create progress error:', error);
     res.status(500).json({ error: 'Server error logging progress.' });
   }
-});
+};
 
-/**
- * GET /api/progress/:userId
- * Get progress for a user (own data or doctor viewing patient)
- */
-app.get('/api/progress/:userId', authMiddleware, async (req, res) => {
+exports.getUserProgress = async (req, res) => {
   try {
-    // Patients can only view own data, doctors can view any patient
     if (req.user.role === 'patient' && req.user.id !== req.params.userId) {
       return res.status(403).json({ error: 'You can only view your own progress.' });
     }
@@ -455,13 +329,9 @@ app.get('/api/progress/:userId', authMiddleware, async (req, res) => {
     console.error('Get progress error:', error);
     res.status(500).json({ error: 'Server error fetching progress.' });
   }
-});
+};
 
-/**
- * GET /api/progress
- * Get own progress (shortcut for patients)
- */
-app.get('/api/progress', authMiddleware, async (req, res) => {
+exports.getOwnProgress = async (req, res) => {
   try {
     const progress = await Progress.find({ userId: req.user.id })
       .sort({ date: -1 })
@@ -472,15 +342,10 @@ app.get('/api/progress', authMiddleware, async (req, res) => {
     console.error('Get progress error:', error);
     res.status(500).json({ error: 'Server error fetching progress.' });
   }
-});
+};
 
-// APPOINTMENT ROUTES
-
-/**
- * POST /api/appointments
- * Book an appointment (Patient only)
- */
-app.post('/api/appointments', authMiddleware, roleMiddleware('patient'), async (req, res) => {
+// --- APPOINTMENTS ---
+exports.bookAppointment = async (req, res) => {
   try {
     const { doctorId, date, time, reason } = req.body;
 
@@ -488,7 +353,6 @@ app.post('/api/appointments', authMiddleware, roleMiddleware('patient'), async (
       return res.status(400).json({ error: 'Doctor, date, time, and reason are required.' });
     }
 
-    // Verify doctor exists
     const doctor = await User.findOne({ _id: doctorId, role: 'doctor' });
     if (!doctor) {
       return res.status(404).json({ error: 'Doctor not found.' });
@@ -502,7 +366,6 @@ app.post('/api/appointments', authMiddleware, roleMiddleware('patient'), async (
       reason
     });
 
-    // Assign patient to doctor if not already assigned
     await User.findByIdAndUpdate(req.user.id, { assignedDoctor: doctorId });
 
     const populated = await Appointment.findById(appointment._id)
@@ -514,13 +377,9 @@ app.post('/api/appointments', authMiddleware, roleMiddleware('patient'), async (
     console.error('Book appointment error:', error);
     res.status(500).json({ error: 'Server error booking appointment.' });
   }
-});
+};
 
-/**
- * GET /api/appointments
- * Get appointments based on role
- */
-app.get('/api/appointments', authMiddleware, async (req, res) => {
+exports.getAppointments = async (req, res) => {
   try {
     let appointments;
     if (req.user.role === 'patient') {
@@ -538,13 +397,9 @@ app.get('/api/appointments', authMiddleware, async (req, res) => {
     console.error('Get appointments error:', error);
     res.status(500).json({ error: 'Server error fetching appointments.' });
   }
-});
+};
 
-/**
- * PUT /api/appointments/:id
- * Update appointment status (Doctor only)
- */
-app.put('/api/appointments/:id', authMiddleware, roleMiddleware('doctor'), async (req, res) => {
+exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { status, notes } = req.body;
 
@@ -563,13 +418,9 @@ app.put('/api/appointments/:id', authMiddleware, roleMiddleware('doctor'), async
     console.error('Update appointment error:', error);
     res.status(500).json({ error: 'Server error updating appointment.' });
   }
-});
+};
 
-/**
- * GET /api/doctors
- * Get list of all doctors (for patient to select when booking)
- */
-app.get('/api/doctors', authMiddleware, async (req, res) => {
+exports.getDoctors = async (req, res) => {
   try {
     const doctors = await User.find({ role: 'doctor' }).select('name email specialization');
     res.json(doctors);
@@ -577,13 +428,9 @@ app.get('/api/doctors', authMiddleware, async (req, res) => {
     console.error('Get doctors error:', error);
     res.status(500).json({ error: 'Server error fetching doctors.' });
   }
-});
+};
 
-/**
- * GET /api/patients
- * Get list of all patients (for doctor)
- */
-app.get('/api/patients', authMiddleware, roleMiddleware('doctor'), async (req, res) => {
+exports.getPatients = async (req, res) => {
   try {
     const patients = await User.find({ role: 'patient' }).select('name email phone createdAt');
     res.json(patients);
@@ -591,15 +438,10 @@ app.get('/api/patients', authMiddleware, roleMiddleware('doctor'), async (req, r
     console.error('Get patients error:', error);
     res.status(500).json({ error: 'Server error fetching patients.' });
   }
-});
+};
 
-// CHAT ROUTES (GEMINI AI INTEGRATION)
-
-/**
- * POST /api/chat
- * Send message to Gemini AI and get a response
- */
-app.post('/api/chat', authMiddleware, async (req, res) => {
+// --- CHAT (GEMINI AI) ---
+exports.chat = async (req, res) => {
   try {
     const { message } = req.body;
 
@@ -607,19 +449,16 @@ app.post('/api/chat', authMiddleware, async (req, res) => {
       return res.status(400).json({ error: 'Message is required.' });
     }
 
-    // Find or create chat session for user
-    let chat = await Chat.findOne({ userId: req.user.id });
-    if (!chat) {
-      chat = await Chat.create({ userId: req.user.id, messages: [] });
+    let chatSession = await Chat.findOne({ userId: req.user.id });
+    if (!chatSession) {
+      chatSession = await Chat.create({ userId: req.user.id, messages: [] });
     }
 
-    // Add user message
-    chat.messages.push({ role: 'user', content: message.trim() });
+    chatSession.messages.push({ role: 'user', content: message.trim() });
 
     let aiResponse;
 
     if (geminiModel) {
-      // Build context for Gemini
       const systemPrompt = `You are a helpful rehabilitation and recovery assistant called "Recovery AI". 
 You help patients with their rehabilitation journey by providing:
 - Exercise guidance and tips
@@ -631,7 +470,7 @@ You help patients with their rehabilitation journey by providing:
 Important: You are NOT a replacement for medical professionals. Always recommend consulting with their doctor for medical decisions.
 Keep responses concise, helpful, and empathetic. Use simple language.`;
 
-      const recentMessages = chat.messages.slice(-10).map(m =>
+      const recentMessages = chatSession.messages.slice(-10).map(m =>
         `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`
       ).join('\n');
 
@@ -646,7 +485,6 @@ Keep responses concise, helpful, and empathetic. Use simple language.`;
         aiResponse = "I'm having trouble connecting to my AI service right now. Please try again shortly, or contact your healthcare provider for immediate assistance.";
       }
     } else {
-      // Fallback responses when Gemini is not configured
       const fallbacks = [
         "Thank you for your message! I'm here to help with your rehabilitation journey. While my AI connection is being set up, please don't hesitate to reach out to your healthcare provider for personalized advice.",
         "I appreciate your question! My advanced AI features are currently being configured. In the meantime, remember to stay consistent with your exercises and track your progress daily.",
@@ -655,49 +493,25 @@ Keep responses concise, helpful, and empathetic. Use simple language.`;
       aiResponse = fallbacks[Math.floor(Math.random() * fallbacks.length)];
     }
 
-    // Add assistant response
-    chat.messages.push({ role: 'assistant', content: aiResponse });
-    await chat.save();
+    chatSession.messages.push({ role: 'assistant', content: aiResponse });
+    await chatSession.save();
 
     res.json({
       message: aiResponse,
-      chatId: chat._id
+      chatId: chatSession._id
     });
   } catch (error) {
     console.error('Chat error:', error);
     res.status(500).json({ error: 'Server error processing chat message.' });
   }
-});
+};
 
-/**
- * GET /api/chat
- * Get chat history for authenticated user
- */
-app.get('/api/chat', authMiddleware, async (req, res) => {
+exports.getChatHistory = async (req, res) => {
   try {
-    const chat = await Chat.findOne({ userId: req.user.id });
-    res.json(chat ? chat.messages : []);
+    const chatSession = await Chat.findOne({ userId: req.user.id });
+    res.json(chatSession ? chatSession.messages : []);
   } catch (error) {
     console.error('Get chat error:', error);
     res.status(500).json({ error: 'Server error fetching chat history.' });
   }
-});
-
-
-// HEALTH CHECK
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
-});
-
-// START SERVER
-
-app.listen(PORT, () => {
-  console.log(`
-  ╔══════════════════════════════════════════════╗
-  ║   Rehab Tracker API Server                   ║
-  ║   Running on http://localhost:${PORT}            ║
-  ║   Environment: ${process.env.NODE_ENV || 'development'}              ║
-  ╚══════════════════════════════════════════════╝
-  `);
-});
+};

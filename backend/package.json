@@ -2,10 +2,10 @@
   "name": "rehab-tracker-backend",
   "version": "1.0.0",
   "description": "Rehabilitation & Recovery Progress Tracker - Backend API",
-  "main": "app.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "node app.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
     "express": "^4.21.0",
