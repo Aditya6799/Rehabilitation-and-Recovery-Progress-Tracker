@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { User, Exercise, Progress, Appointment, Chat } = require('./db');
+const { User, Exercise, Progress, Appointment, Chat, Feedback } = require('./db');
 
 let genAI;
 let geminiModel;
@@ -513,5 +513,109 @@ exports.getChatHistory = async (req, res) => {
   } catch (error) {
     console.error('Get chat error:', error);
     res.status(500).json({ error: 'Server error fetching chat history.' });
+  }
+};
+
+// --- FEEDBACK ---
+exports.createFeedback = async (req, res) => {
+  try {
+    const { patientId, content, actionableSteps, category, priority } = req.body;
+
+    if (!patientId || !content) {
+      return res.status(400).json({ error: 'Patient and feedback content are required.' });
+    }
+
+    const patient = await User.findOne({ _id: patientId, role: 'patient' });
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found.' });
+    }
+
+    const steps = (actionableSteps || []).filter(s => s && s.trim()).map(s => ({ text: s.trim(), completed: false }));
+
+    const feedback = await Feedback.create({
+      patientId,
+      doctorId: req.user.id,
+      content,
+      actionableSteps: steps,
+      category: category || 'general',
+      priority: priority || 'medium'
+    });
+
+    const populated = await Feedback.findById(feedback._id)
+      .populate('doctorId', 'name specialization')
+      .populate('patientId', 'name email');
+
+    res.status(201).json({ message: 'Feedback sent successfully.', feedback: populated });
+  } catch (error) {
+    console.error('Create feedback error:', error);
+    res.status(500).json({ error: 'Server error creating feedback.' });
+  }
+};
+
+exports.getFeedback = async (req, res) => {
+  try {
+    let feedback;
+    if (req.user.role === 'patient') {
+      feedback = await Feedback.find({ patientId: req.user.id })
+        .populate('doctorId', 'name specialization')
+        .sort({ createdAt: -1 });
+    } else {
+      const query = { doctorId: req.user.id };
+      if (req.query.patientId) query.patientId = req.query.patientId;
+      feedback = await Feedback.find(query)
+        .populate('patientId', 'name email')
+        .populate('doctorId', 'name specialization')
+        .sort({ createdAt: -1 });
+    }
+
+    res.json(feedback);
+  } catch (error) {
+    console.error('Get feedback error:', error);
+    res.status(500).json({ error: 'Server error fetching feedback.' });
+  }
+};
+
+exports.markFeedbackRead = async (req, res) => {
+  try {
+    const feedback = await Feedback.findOneAndUpdate(
+      { _id: req.params.id, patientId: req.user.id },
+      { $set: { read: true } },
+      { new: true }
+    );
+
+    if (!feedback) {
+      return res.status(404).json({ error: 'Feedback not found.' });
+    }
+
+    res.json({ message: 'Feedback marked as read.', feedback });
+  } catch (error) {
+    console.error('Mark feedback read error:', error);
+    res.status(500).json({ error: 'Server error updating feedback.' });
+  }
+};
+
+exports.toggleFeedbackStep = async (req, res) => {
+  try {
+    const feedback = await Feedback.findOne({
+      _id: req.params.id,
+      patientId: req.user.id
+    });
+
+    if (!feedback) {
+      return res.status(404).json({ error: 'Feedback not found.' });
+    }
+
+    const stepIndex = parseInt(req.params.stepIndex);
+    if (isNaN(stepIndex) || stepIndex < 0 || stepIndex >= feedback.actionableSteps.length) {
+      return res.status(400).json({ error: 'Invalid step index.' });
+    }
+
+    feedback.actionableSteps[stepIndex].completed = !feedback.actionableSteps[stepIndex].completed;
+    await feedback.save();
+
+    res.json({ message: 'Step toggled.', feedback });
+  } catch (error) {
+    console.error('Toggle step error:', error);
+    res.status(500).json({ error: 'Server error toggling step.' });
   }
 };

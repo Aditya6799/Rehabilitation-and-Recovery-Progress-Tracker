@@ -33,6 +33,12 @@ router.put('/appointments/:id', authMiddleware, roleMiddleware('doctor'), contro
 router.get('/doctors', authMiddleware, controllers.getDoctors);
 router.get('/patients', authMiddleware, roleMiddleware('doctor'), controllers.getPatients);
 
+// --- FEEDBACK ROUTES ---
+router.post('/feedback', authMiddleware, roleMiddleware('doctor'), controllers.createFeedback);
+router.get('/feedback', authMiddleware, controllers.getFeedback);
+router.put('/feedback/:id/read', authMiddleware, roleMiddleware('patient'), controllers.markFeedbackRead);
+router.put('/feedback/:id/step/:stepIndex', authMiddleware, roleMiddleware('patient'), controllers.toggleFeedbackStep);
+
 // --- CHAT ROUTES ---
 router.post('/chat', authMiddleware, controllers.chat);
 router.get('/chat', authMiddleware, controllers.getChatHistory);

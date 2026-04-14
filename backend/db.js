@@ -221,6 +221,45 @@ const chatSchema = new mongoose.Schema({
 
 const Chat = mongoose.model('Chat', chatSchema);
 
+// Feedback Schema
+const feedbackSchema = new mongoose.Schema({
+  patientId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  doctorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  content: {
+    type: String,
+    required: [true, 'Feedback content is required'],
+    trim: true
+  },
+  actionableSteps: [{
+    text: { type: String, required: true },
+    completed: { type: Boolean, default: false }
+  }],
+  category: {
+    type: String,
+    enum: ['milestone', 'exercise', 'pain-management', 'general', 'motivation'],
+    default: 'general'
+  },
+  priority: {
+    type: String,
+    enum: ['low', 'medium', 'high'],
+    default: 'medium'
+  },
+  read: {
+    type: Boolean,
+    default: false
+  }
+}, { timestamps: true });
+
+const Feedback = mongoose.model('Feedback', feedbackSchema);
+
 // Export
 module.exports = {
   connectDB,
@@ -228,5 +267,6 @@ module.exports = {
   Exercise,
   Progress,
   Appointment,
-  Chat
+  Chat,
+  Feedback
 };
