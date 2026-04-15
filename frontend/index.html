@@ -1142,6 +1142,44 @@
         opacity: 1;
         transform: translateY(0);
       }
+
+      /* ---- Entrance Animations ---- */
+      @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(28px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes scaleIn {
+        from { opacity: 0; transform: scale(0.88); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(40px); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+      @keyframes floatBob {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+      @keyframes pulseGlow {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(0, 89, 187, 0.18); }
+        50% { box-shadow: 0 0 0 12px rgba(0, 89, 187, 0); }
+      }
+      .nav { animation: fadeInDown 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+      .nav-logo-icon { animation: scaleIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.15s backwards; }
+      .hero-text h1 { animation: fadeInUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.15s backwards; }
+      .hero-text p { animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s backwards; }
+      .hero-actions { animation: fadeInUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.45s backwards; }
+      .hero-stat { animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+      .hero-stat:nth-child(1) { animation-delay: 0.5s; }
+      .hero-stat:nth-child(2) { animation-delay: 0.58s; }
+      .hero-stat:nth-child(3) { animation-delay: 0.66s; }
+      .hero-card { animation: slideInRight 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.3s backwards, floatBob 4s ease-in-out 1.5s infinite; }
+      .hero-progress-ring { animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.6s backwards; }
+      .btn-primary { animation: pulseGlow 2.5s ease-in-out 2s 2; }
     </style>
   </head>
   <body>

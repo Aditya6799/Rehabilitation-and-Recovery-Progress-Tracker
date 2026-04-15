@@ -1,6 +1,9 @@
 // db.js — MongoDB Atlas Connection & Mongoose Schemas
 // Rehabilitation & Recovery Progress Tracker
 
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '8.8.4.4']);
+
 const mongoose = require('mongoose');
 
 // Connect to MongoDB Atlas 
