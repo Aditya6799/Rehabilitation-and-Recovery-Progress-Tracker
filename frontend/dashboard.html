@@ -11,6 +11,7 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
     rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
       --primary: #0059bb;
@@ -841,6 +842,12 @@
       align-self: flex-start;
       border-bottom-left-radius: var(--radius-sm);
     }
+
+    .chat-bubble p { margin-bottom: 8px; }
+    .chat-bubble p:last-child { margin-bottom: 0; }
+    .chat-bubble ul, .chat-bubble ol { margin-left: 20px; margin-bottom: 8px; }
+    .chat-bubble li { margin-bottom: 4px; }
+    .chat-bubble strong { font-weight: 700; color: inherit; }
 
     .typing-indicator {
       display: flex;
@@ -1718,7 +1725,7 @@
           body: JSON.stringify({ message: msg }),
         });
         typing.remove();
-        chatMessages.innerHTML += `<div class="chat-bubble assistant">${data.message}</div>`;
+        chatMessages.innerHTML += `<div class="chat-bubble assistant">${marked.parse(data.message)}</div>`;
       } catch (err) {
         typing.remove();
         chatMessages.innerHTML += `<div class="chat-bubble assistant">Sorry, I couldn't process that. Please try again.</div>`;
@@ -1738,8 +1745,10 @@
         if (messages && messages.length > 0) {
           const recent = messages.slice(-20);
           recent.forEach((m) => {
-            chatMessages.innerHTML += `<div class="chat-bubble ${m.role}">${m.content}</div>`;
+            const content = m.role === 'assistant' ? marked.parse(m.content) : m.content;
+            chatMessages.innerHTML += `<div class="chat-bubble ${m.role}">${content}</div>`;
           });
+          chatMessages.scrollTop = chatMessages.scrollHeight;
         }
       } catch (e) {
         /* Ignore - first time user */

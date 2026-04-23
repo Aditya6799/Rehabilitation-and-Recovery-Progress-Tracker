@@ -7,9 +7,9 @@ let genAI;
 let geminiModel;
 try {
   genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  geminiModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  geminiModel = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 } catch (err) {
-  console.warn('⚠️  Gemini AI not configured. Chat will return fallback responses.');
+  console.warn('Gemini AI not configured. Chat will return fallback responses.');
 }
 
 // --- AUTH ---
