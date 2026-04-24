@@ -817,8 +817,7 @@
 
     async function loadPatients() {
       try {
-        const dashData = await api("/dashboard");
-        patients = dashData.patients || [];
+        patients = await api("/patients");
       } catch (err) {
         console.error(err);
       }

@@ -148,7 +148,7 @@ exports.getDashboard = async (req, res) => {
       const [progressEntries, exercises, appointments, recentProgress] = await Promise.all([
         Progress.countDocuments({ userId: req.user.id }),
         Exercise.find({ assignedTo: req.user.id }).limit(5).populate('createdBy', 'name'),
-        Appointment.find({ patientId: req.user.id }).sort({ date: -1 }).limit(5).populate('doctorId', 'name specialization'),
+        Appointment.find({ patientId: req.user.id }).sort({ date: -1 }).limit(5).populate('doctorId', 'name specialization phone'),
         Progress.find({ userId: req.user.id }).sort({ date: -1 }).limit(30)
       ]);
 
@@ -174,22 +174,25 @@ exports.getDashboard = async (req, res) => {
         latestProgress
       });
     } else if (req.user.role === 'doctor') {
-      const [patients, exercises, appointments, recentAppointments] = await Promise.all([
+      const [allPatients, assignedPatients, exercises, appointments, recentAppointments] = await Promise.all([
+        User.find({ role: 'patient' }).select('-password'),
         User.find({ role: 'patient', assignedDoctor: req.user.id }).select('-password'),
         Exercise.countDocuments({ createdBy: req.user.id }),
         Appointment.countDocuments({ doctorId: req.user.id }),
-        Appointment.find({ doctorId: req.user.id }).sort({ date: -1 }).limit(10).populate('patientId', 'name email')
+        Appointment.find({ doctorId: req.user.id }).sort({ date: -1 }).limit(10).populate('patientId', 'name email phone')
       ]);
 
       res.json({
         role: 'doctor',
         stats: {
-          totalPatients: patients.length,
+          totalPatients: allPatients.length,
+          assignedPatients: assignedPatients.length,
           totalExercises: exercises,
           totalAppointments: appointments,
           pendingAppointments: recentAppointments.filter(a => a.status === 'pending').length
         },
-        patients,
+        patients: allPatients,
+        assignedPatientsList: assignedPatients,
         recentAppointments
       });
     }
@@ -296,19 +299,48 @@ exports.logProgress = async (req, res) => {
       return res.status(400).json({ error: 'Pain level and exercise completion are required.' });
     }
 
-    const progress = await Progress.create({
+    const targetDate = date ? new Date(date) : new Date();
+    // Create start and end of day to query for existing entries
+    const startOfDay = new Date(targetDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(targetDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const existingProgress = await Progress.findOne({
       userId: req.user.id,
-      date: date || new Date(),
-      painLevel,
-      exerciseCompletion,
-      mood: mood || 'okay',
-      notes: notes || '',
-      exercisesCompleted: exercisesCompleted || []
+      date: { $gte: startOfDay, $lte: endOfDay }
     });
 
-    res.status(201).json({ message: 'Progress logged successfully.', progress });
+    let progress;
+    if (existingProgress) {
+      // Update existing entry
+      progress = await Progress.findByIdAndUpdate(
+        existingProgress._id,
+        {
+          painLevel,
+          exerciseCompletion,
+          mood: mood || 'okay',
+          notes: notes || '',
+          exercisesCompleted: exercisesCompleted || existingProgress.exercisesCompleted
+        },
+        { new: true }
+      );
+      res.status(200).json({ message: 'Progress updated for today.', progress });
+    } else {
+      // Create new entry
+      progress = await Progress.create({
+        userId: req.user.id,
+        date: targetDate,
+        painLevel,
+        exerciseCompletion,
+        mood: mood || 'okay',
+        notes: notes || '',
+        exercisesCompleted: exercisesCompleted || []
+      });
+      res.status(201).json({ message: 'Progress logged successfully.', progress });
+    }
   } catch (error) {
-    console.error('Create progress error:', error);
+    console.error('Create/Update progress error:', error);
     res.status(500).json({ error: 'Server error logging progress.' });
   }
 };
@@ -384,11 +416,11 @@ exports.getAppointments = async (req, res) => {
     let appointments;
     if (req.user.role === 'patient') {
       appointments = await Appointment.find({ patientId: req.user.id })
-        .populate('doctorId', 'name specialization')
+        .populate('doctorId', 'name specialization phone')
         .sort({ date: -1 });
     } else {
       appointments = await Appointment.find({ doctorId: req.user.id })
-        .populate('patientId', 'name email')
+        .populate('patientId', 'name email phone')
         .sort({ date: -1 });
     }
 

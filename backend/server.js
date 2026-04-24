@@ -25,10 +25,8 @@ app.use('/api', routes);
 // START SERVER
 app.listen(PORT, () => {
   console.log(`
-  ╔══════════════════════════════════════════════╗
-  ║   Rehab Tracker API Server                   ║
-  ║   Running on http://localhost:${PORT}            ║
-  ║   Environment: ${process.env.NODE_ENV || 'development'}              ║
-  ╚══════════════════════════════════════════════╝
+  Rehab Tracker API Server                   
+  Running on http://localhost:${PORT}        
+  Environment: ${process.env.NODE_ENV || 'development'}       
   `);
 });

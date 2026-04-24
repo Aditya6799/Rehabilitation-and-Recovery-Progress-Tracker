@@ -1137,8 +1137,8 @@
       const select = document.getElementById("exAssignedTo");
       document.getElementById("assignGroup").style.display = "block";
       try {
-        const dashboardData = await api("/dashboard");
-        select.innerHTML = dashboardData.patients.map(p => `<option value="${p._id}">${p.name}</option>`).join("");
+        const patients = await api("/patients");
+        select.innerHTML = patients.map(p => `<option value="${p._id}">${p.name}</option>`).join("");
       } catch (err) {
         console.error(err);
       }

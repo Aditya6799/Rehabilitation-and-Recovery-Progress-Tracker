@@ -558,6 +558,123 @@
         outline: none;
         min-width: 240px;
       }
+      /* Searchable Dropdown */
+      .search-select {
+        position: relative;
+        min-width: 320px;
+        max-width: 420px;
+      }
+      .search-select-input {
+        width: 100%;
+        padding: 11px 40px 11px 14px;
+        border: 2px solid var(--outline-variant);
+        border-radius: var(--radius-md);
+        background: var(--surface-container-lowest);
+        color: var(--on-surface);
+        font-family: var(--font-body);
+        font-size: 0.85rem;
+        outline: none;
+        transition: all var(--transition);
+        cursor: pointer;
+      }
+      .search-select-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(0, 89, 187, 0.08);
+        cursor: text;
+      }
+      body.dark .search-select-input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(173, 199, 255, 0.08);
+      }
+      .search-select-arrow {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--on-surface-variant);
+        font-size: 12px;
+        transition: transform 0.2s ease;
+      }
+      .search-select.open .search-select-arrow {
+        transform: translateY(-50%) rotate(180deg);
+      }
+      .search-select-dropdown {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background: var(--surface-container-lowest);
+        border: 2px solid var(--outline-variant);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        z-index: 100;
+        max-height: 240px;
+        overflow-y: auto;
+        display: none;
+        animation: dropdownOpen 0.15s ease;
+      }
+      .search-select.open .search-select-dropdown {
+        display: block;
+      }
+      @keyframes dropdownOpen {
+        from { opacity: 0; transform: translateY(-6px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .search-select-option {
+        padding: 10px 14px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background 0.15s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .search-select-option:hover, .search-select-option.highlighted {
+        background: var(--surface-container-high);
+      }
+      .search-select-option.selected {
+        background: var(--primary-fixed);
+        color: var(--primary);
+        font-weight: 600;
+      }
+      body.dark .search-select-option.selected {
+        background: var(--primary-container);
+      }
+      .search-select-option .opt-avatar {
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius-full);
+        background: var(--primary-fixed);
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+      body.dark .search-select-option .opt-avatar {
+        background: var(--primary-container);
+      }
+      .search-select-option .opt-info {
+        display: flex;
+        flex-direction: column;
+      }
+      .search-select-option .opt-name {
+        font-weight: 600;
+        font-size: 0.82rem;
+      }
+      .search-select-option .opt-email {
+        font-size: 0.7rem;
+        color: var(--on-surface-variant);
+      }
+      .search-select-empty {
+        padding: 16px 14px;
+        text-align: center;
+        font-size: 0.82rem;
+        color: var(--on-surface-variant);
+      }
       .toast-container {
         position: fixed;
         top: 24px;
@@ -1073,7 +1190,12 @@
         container.innerHTML = `
         <div class="patient-selector">
           <label class="form-label">Select Patient</label>
-          <select id="patientSelect"><option value="">Loading patients...</option></select>
+          <div class="search-select" id="patientSearchSelect">
+            <input type="text" class="search-select-input" id="patientSearchInput" placeholder="🔍 Search patients..." autocomplete="off" />
+            <span class="search-select-arrow">▼</span>
+            <div class="search-select-dropdown" id="patientDropdown"></div>
+          </div>
+          <input type="hidden" id="patientSelect" value="" />
         </div>
         <div class="progress-grid">
           <div class="card card-full"><div class="card-header"><div class="card-title">Patient Progress Trend</div></div><div class="chart-container"><canvas id="progressChart"></canvas></div></div>
@@ -1082,25 +1204,102 @@
       `;
         try {
           const patients = await api("/patients");
-          const sel = document.getElementById("patientSelect");
-          sel.innerHTML =
-            '<option value="">— Select a patient —</option>' +
-            patients
-              .map(
-                (p) =>
-                  `<option value="${p._id}">${p.name} (${p.email})</option>`,
-              )
-              .join("");
-          sel.addEventListener("change", async () => {
-            if (!sel.value) return;
+          const wrapper = document.getElementById("patientSearchSelect");
+          const input = document.getElementById("patientSearchInput");
+          const dropdown = document.getElementById("patientDropdown");
+          const hiddenInput = document.getElementById("patientSelect");
+          let highlightedIdx = -1;
+
+          function getInitials(name) {
+            return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+          }
+
+          function renderOptions(filter = "") {
+            const q = filter.toLowerCase();
+            const filtered = patients.filter(p =>
+              p.name.toLowerCase().includes(q) || p.email.toLowerCase().includes(q)
+            );
+            highlightedIdx = -1;
+            if (filtered.length === 0) {
+              dropdown.innerHTML = '<div class="search-select-empty">No patients found</div>';
+              return;
+            }
+            dropdown.innerHTML = filtered.map((p, i) => `
+              <div class="search-select-option ${hiddenInput.value === p._id ? 'selected' : ''}" data-id="${p._id}" data-name="${p.name}" data-email="${p.email}" data-index="${i}">
+                <div class="opt-avatar">${getInitials(p.name)}</div>
+                <div class="opt-info">
+                  <span class="opt-name">${p.name}</span>
+                  <span class="opt-email">${p.email}</span>
+                </div>
+              </div>
+            `).join("");
+          }
+
+          function openDropdown() {
+            wrapper.classList.add("open");
+            renderOptions(input.value);
+          }
+          function closeDropdown() {
+            wrapper.classList.remove("open");
+            highlightedIdx = -1;
+          }
+
+          async function selectPatient(id, name) {
+            hiddenInput.value = id;
+            input.value = name;
+            closeDropdown();
             try {
-              const data = await api(`/progress/${sel.value}`);
+              const data = await api(`/progress/${id}`);
               renderProgressTable(data);
               drawProgressChart(data.slice().reverse());
             } catch (err) {
               showToast(err.message);
             }
+          }
+
+          input.addEventListener("focus", () => {
+            input.select();
+            openDropdown();
           });
+          input.addEventListener("input", () => {
+            openDropdown();
+          });
+
+          dropdown.addEventListener("click", (e) => {
+            const opt = e.target.closest(".search-select-option");
+            if (opt) selectPatient(opt.dataset.id, opt.dataset.name);
+          });
+
+          input.addEventListener("keydown", (e) => {
+            const opts = dropdown.querySelectorAll(".search-select-option");
+            if (!opts.length) return;
+            if (e.key === "ArrowDown") {
+              e.preventDefault();
+              highlightedIdx = Math.min(highlightedIdx + 1, opts.length - 1);
+              opts.forEach((o, i) => o.classList.toggle("highlighted", i === highlightedIdx));
+              opts[highlightedIdx]?.scrollIntoView({ block: "nearest" });
+            } else if (e.key === "ArrowUp") {
+              e.preventDefault();
+              highlightedIdx = Math.max(highlightedIdx - 1, 0);
+              opts.forEach((o, i) => o.classList.toggle("highlighted", i === highlightedIdx));
+              opts[highlightedIdx]?.scrollIntoView({ block: "nearest" });
+            } else if (e.key === "Enter") {
+              e.preventDefault();
+              if (highlightedIdx >= 0 && opts[highlightedIdx]) {
+                const opt = opts[highlightedIdx];
+                selectPatient(opt.dataset.id, opt.dataset.name);
+              }
+            } else if (e.key === "Escape") {
+              closeDropdown();
+              input.blur();
+            }
+          });
+
+          document.addEventListener("click", (e) => {
+            if (!wrapper.contains(e.target)) closeDropdown();
+          });
+
+          renderOptions();
         } catch (err) {
           showToast("Failed to load patients");
         }
