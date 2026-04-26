@@ -6,7 +6,8 @@ dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 const mongoose = require('mongoose');
 
-// Connect to MongoDB Atlas 
+//Connect to MongoDB Atlas
+
 const connectDB = async () => {
   try {
     const conn = await mongoose.connect(process.env.MONGO_URI);
