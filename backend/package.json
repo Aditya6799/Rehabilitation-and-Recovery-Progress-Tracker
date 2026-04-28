@@ -16,7 +16,13 @@
     "dotenv": "^16.4.5",
     "@google/generative-ai": "^0.21.0"
   },
-  "keywords": ["rehabilitation", "health", "tracker", "express", "mongodb"],
+  "keywords": [
+    "rehabilitation",
+    "health",
+    "tracker",
+    "express",
+    "mongodb"
+  ],
   "author": "",
   "license": "ISC"
 }
