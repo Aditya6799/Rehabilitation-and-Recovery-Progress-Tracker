@@ -1077,6 +1077,7 @@
             <span class="appt-status ${a.status}">${a.status}</span>
           </div>
           <div class="appt-details">
+            <div class="appt-detail">📅 ${d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</div>
             <div class="appt-detail">🕐 ${a.time}</div>
             <div class="appt-detail">📋 ${a.reason}</div>
           </div>

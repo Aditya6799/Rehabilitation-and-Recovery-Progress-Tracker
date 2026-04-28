@@ -976,6 +976,10 @@
             <label class="form-label">Duration (minutes)</label>
             <input type="number" class="form-input" id="exDuration" min="1" value="15" required />
           </div>
+          <div class="form-group">
+            <label class="form-label">Days to Complete</label>
+            <input type="number" class="form-input" id="exDaysToComplete" min="1" value="7" required />
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label">Difficulty</label>
@@ -1215,6 +1219,7 @@
           <h3>${ex.title}</h3>
           <div class="exercise-meta">
             <span>⏱ ${ex.duration} min</span>
+            <span>📅 ${ex.daysToComplete || 7} days</span>
             <span>📂 ${ex.category}</span>
           </div>
           ${assignBlock}
@@ -1265,6 +1270,9 @@
       document.getElementById("exDuration").value = exercise
         ? exercise.duration
         : 15;
+      document.getElementById("exDaysToComplete").value = exercise
+        ? exercise.daysToComplete || 7
+        : 7;
       document.getElementById("exDifficulty").value = exercise
         ? exercise.difficulty
         : "beginner";
@@ -1297,6 +1305,7 @@
           title: document.getElementById("exTitle").value,
           category: document.getElementById("exCategory").value,
           duration: parseInt(document.getElementById("exDuration").value),
+          daysToComplete: parseInt(document.getElementById("exDaysToComplete").value),
           difficulty: document.getElementById("exDifficulty").value,
           instructions: document.getElementById("exInstructions").value,
           videoUrl: document.getElementById("exVideoUrl").value,

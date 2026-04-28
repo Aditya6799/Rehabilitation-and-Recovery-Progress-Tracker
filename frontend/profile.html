@@ -906,7 +906,8 @@
           document.getElementById("profileMeta").innerHTML = `
           <div class="profile-meta-item"><span>Member Since</span><span>${new Date(profile.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })}</span></div>
           <div class="profile-meta-item"><span>Phone</span><span>${profile.phone || "Not set"}</span></div>
-          ${profile.role === "doctor" ? `<div class="profile-meta-item"><span>Specialization</span><span>${profile.specialization || "Not set"}</span></div>` : ""}
+          ${profile.role === "doctor" ? `<div class="profile-meta-item"><span>Specialization</span><span>${profile.specialization || "Not set"}</span></div>
+          <div class="profile-meta-item"><span>License</span><span>${profile.licenseNumber || "Not set"}</span></div>` : ""}
         `;
 
           // Fill form

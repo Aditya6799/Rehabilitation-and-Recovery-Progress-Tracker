@@ -90,6 +90,11 @@ const exerciseSchema = new mongoose.Schema({
     required: [true, 'Duration is required'],
     min: 1
   },
+  daysToComplete: {
+    type: Number,
+    default: 7,
+    min: 1
+  },
   difficulty: {
     type: String,
     enum: ['beginner', 'intermediate', 'advanced'],

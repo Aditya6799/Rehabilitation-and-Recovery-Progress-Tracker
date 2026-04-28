@@ -205,7 +205,7 @@ exports.getDashboard = async (req, res) => {
 // --- EXERCISES ---
 exports.createExercise = async (req, res) => {
   try {
-    const { title, category, duration, difficulty, instructions, targetArea, assignedTo, videoUrl } = req.body;
+    const { title, category, duration, daysToComplete, difficulty, instructions, targetArea, assignedTo, videoUrl } = req.body;
 
     if (!title || !category || !duration || !instructions) {
       return res.status(400).json({ error: 'Title, category, duration, and instructions are required.' });
@@ -215,6 +215,7 @@ exports.createExercise = async (req, res) => {
       title,
       category,
       duration,
+      daysToComplete: daysToComplete || 7,
       difficulty: difficulty || 'beginner',
       instructions,
       targetArea: targetArea || '',

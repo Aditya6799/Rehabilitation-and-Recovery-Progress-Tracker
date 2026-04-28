@@ -338,39 +338,75 @@
       .role-selector {
         display: flex;
         gap: 12px;
-        margin-bottom: 24px;
+        margin-bottom: 28px;
       }
       .role-option {
         flex: 1;
-        padding: 16px;
+        padding: 20px 16px;
         border: 2px solid var(--outline-variant);
         border-radius: var(--radius-lg);
         cursor: pointer;
         text-align: center;
         transition: all var(--transition);
         background: var(--surface-container-low);
+        position: relative;
       }
       .role-option:hover {
         border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-sm);
       }
       .role-option.active {
         border-color: var(--primary);
         background: var(--primary-fixed);
+        box-shadow: 0 0 0 3px rgba(0, 89, 187, 0.12);
       }
       body.dark .role-option.active {
         background: var(--primary-container);
+        box-shadow: 0 0 0 3px rgba(173, 199, 255, 0.12);
       }
       .role-option-icon {
-        font-size: 28px;
-        margin-bottom: 8px;
+        font-size: 30px;
+        margin-bottom: 10px;
+        display: block;
       }
       .role-option-label {
         font-family: var(--font-headline);
-        font-size: 0.85rem;
-        font-weight: 600;
+        font-size: 0.9rem;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 4px;
+      }
+      .role-option-desc {
+        font-size: 0.72rem;
+        color: var(--on-surface-variant);
+        display: block;
+      }
+      .role-option.active .role-option-desc {
+        color: var(--primary);
+      }
+      body.dark .role-option.active .role-option-desc {
+        color: var(--primary-fixed-dim);
       }
       .role-option input {
         display: none;
+      }
+      .role-option .role-check {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 20px;
+        height: 20px;
+        border-radius: var(--radius-full);
+        background: var(--primary);
+        color: #fff;
+        font-size: 11px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+      }
+      .role-option.active .role-check {
+        display: flex;
       }
       .btn-submit {
         width: 100%;
@@ -578,8 +614,25 @@
         <a href="index.html" class="auth-back">← Back to Home</a>
         <h2>Log In</h2>
         <p class="auth-subtitle">
-          Enter your credentials to access your dashboard.
+          Select your role and enter your credentials to continue.
         </p>
+
+        <div class="role-selector" id="roleSelector">
+          <label class="role-option active" data-role="patient">
+            <input type="radio" name="role" value="patient" checked />
+            <span class="role-check">✓</span>
+            <span class="role-option-icon">👤</span>
+            <span class="role-option-label">Patient</span>
+            <span class="role-option-desc">Track recovery progress</span>
+          </label>
+          <label class="role-option" data-role="doctor">
+            <input type="radio" name="role" value="doctor" />
+            <span class="role-check">✓</span>
+            <span class="role-option-icon">🩺</span>
+            <span class="role-option-label">Doctor</span>
+            <span class="role-option-desc">Manage patients &amp; plans</span>
+          </label>
+        </div>
 
         <form id="loginForm" novalidate>
           <div class="form-group">
@@ -627,12 +680,24 @@
 
     <script>
       const API_BASE = window.location.origin + "/api";
+      let selectedRole = "patient";
+
       (function () {
         if (localStorage.getItem("theme") === "dark") {
           document.body.classList.add("dark");
           document.getElementById("themeToggle").textContent = "☀️";
         }
       })();
+
+      // Role selector logic
+      document.querySelectorAll('.role-option').forEach(option => {
+        option.addEventListener('click', () => {
+          document.querySelectorAll('.role-option').forEach(o => o.classList.remove('active'));
+          option.classList.add('active');
+          option.querySelector('input').checked = true;
+          selectedRole = option.dataset.role;
+        });
+      });
 
       document.querySelectorAll('.password-toggle').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -713,6 +778,11 @@
               throw new Error(data.error || "Login failed.");
             }
 
+            // Check if selected role matches the account's role
+            if (data.user.role !== selectedRole) {
+              showToast(`This account is registered as a ${data.user.role}, not a ${selectedRole}. Logging you in as ${data.user.role}.`);
+            }
+
             // Store token and user data
             localStorage.setItem("token", data.token);
             localStorage.setItem("user", JSON.stringify(data.user));
@@ -721,7 +791,7 @@
 
             setTimeout(() => {
               window.location.href = "dashboard.html";
-            }, 800);
+            }, 1000);
           } catch (error) {
             showToast(error.message || "Login failed. Please try again.");
           } finally {
