@@ -151,11 +151,33 @@ const API_BASE = window.location.origin + "/api";
     }
 
     function renderExercises(exercises) {
-      const grid = document.getElementById("exercisesGrid");
-      if (!exercises || exercises.length === 0) {
-        grid.innerHTML =
-          '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🏋️</div><p>No exercises found.</p></div>';
-        return;
+      const docView = document.getElementById("doctorExercisesView");
+      const patView = document.getElementById("patientExercisesView");
+      
+      if (user.role === "patient") {
+        if (docView) docView.style.display = "none";
+        if (patView) patView.style.display = "block";
+        
+        const myEx = exercises.filter(e => e.assignedTo && e.assignedTo.some(u => u._id === user.id || u === user.id));
+        const globalEx = exercises.filter(e => !e.assignedTo || e.assignedTo.length === 0);
+        
+        const myGrid = document.getElementById("myExercisesGrid");
+        const globalGrid = document.getElementById("globalExercisesGrid");
+        
+        if (myGrid) myGrid.innerHTML = generateExerciseHTML(myEx);
+        if (globalGrid) globalGrid.innerHTML = generateExerciseHTML(globalEx);
+      } else {
+        if (patView) patView.style.display = "none";
+        if (docView) docView.style.display = "block";
+        
+        const grid = document.getElementById("exercisesGrid");
+        if (grid) grid.innerHTML = generateExerciseHTML(exercises);
+      }
+    }
+
+    function generateExerciseHTML(exercisesList) {
+      if (!exercisesList || exercisesList.length === 0) {
+        return '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🏋️</div><p>No exercises found.</p></div>';
       }
       const iconMap = {
         stretching: "🧘",
@@ -166,7 +188,7 @@ const API_BASE = window.location.origin + "/api";
         mobility: "🦵",
         other: "🏋️",
       };
-      grid.innerHTML = exercises
+      return exercisesList
         .map(
           (ex) => {
             const iframeSrc = getYouTubeEmbedURL(ex.videoUrl);

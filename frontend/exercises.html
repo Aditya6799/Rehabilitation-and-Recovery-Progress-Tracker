@@ -84,11 +84,21 @@
           </div>
           <div id="doctorActions"></div>
         </div>
-        <div class="exercises-grid" id="exercisesGrid">
-          <div class="empty-state">
-            <div class="empty-state-icon">🏋️</div>
-            <p>Loading exercises...</p>
+        <div id="doctorExercisesView">
+          <div class="exercises-grid" id="exercisesGrid">
+            <div class="empty-state">
+              <div class="empty-state-icon">🏋️</div>
+              <p>Loading exercises...</p>
+            </div>
           </div>
+        </div>
+
+        <div id="patientExercisesView" style="display: none;">
+          <h2 class="section-heading">My Exercises</h2>
+          <div class="exercises-grid" id="myExercisesGrid" style="margin-bottom: 32px;"></div>
+          
+          <h2 class="section-heading">Exercises</h2>
+          <div class="exercises-grid" id="globalExercisesGrid"></div>
         </div>
       </div>
     </main>

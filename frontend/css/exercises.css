@@ -410,6 +410,15 @@
       box-shadow: var(--shadow-sm);
     }
 
+    .section-heading {
+      font-family: var(--font-headline);
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--on-surface);
+      letter-spacing: -0.01em;
+    }
+
     .exercises-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
