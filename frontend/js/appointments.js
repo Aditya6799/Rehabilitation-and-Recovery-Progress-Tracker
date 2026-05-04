@@ -234,6 +234,42 @@ const API_BASE = window.location.origin + "/api";
       }
     }
 
+    async function loadAvailableSlots() {
+      const doctorId = document.getElementById("doctorSelect").value;
+      const date = document.getElementById("apptDate").value;
+      const slotSelect = document.getElementById("apptTimeSlot");
+
+      if (!doctorId || !date) {
+        slotSelect.innerHTML = '<option value="">Select doctor & date first</option>';
+        return;
+      }
+
+      slotSelect.innerHTML = '<option value="">Loading slots...</option>';
+
+      try {
+        const data = await api(`/appointments/slots?doctorId=${doctorId}&date=${date}`);
+        if (!data.slots || data.slots.length === 0) {
+          slotSelect.innerHTML = '<option value="">No slots available for this date</option>';
+          return;
+        }
+        slotSelect.innerHTML = '<option value="">\u2014 Pick a time slot \u2014</option>' +
+          data.slots.map(s => {
+            const [h, m] = s.split(':');
+            const hour = parseInt(h);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+            return `<option value="${s}">${displayHour}:${m} ${ampm}</option>`;
+          }).join('');
+      } catch (err) {
+        slotSelect.innerHTML = '<option value="">Failed to load slots</option>';
+        showToast("Could not load available slots");
+      }
+    }
+
+    function onSlotFilterChange() {
+      loadAvailableSlots();
+    }
+
     function openBookModal() {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -243,7 +279,12 @@ const API_BASE = window.location.origin + "/api";
       document.getElementById("apptDate").min = tomorrow
         .toISOString()
         .split("T")[0];
+      document.getElementById("apptTimeSlot").innerHTML =
+        '<option value="">Select doctor & date first</option>';
       document.getElementById("bookModal").classList.add("open");
+      if (document.getElementById("doctorSelect").value) {
+        loadAvailableSlots();
+      }
     }
     function closeBookModal() {
       document.getElementById("bookModal").classList.remove("open");
@@ -255,10 +296,14 @@ const API_BASE = window.location.origin + "/api";
         e.preventDefault();
         const doctorId = document.getElementById("doctorSelect").value;
         const date = document.getElementById("apptDate").value;
-        const time = document.getElementById("apptTime").value;
+        const time = document.getElementById("apptTimeSlot").value;
         const reason = document.getElementById("apptReason").value;
         if (!doctorId) {
           showToast("Please select a doctor");
+          return;
+        }
+        if (!time) {
+          showToast("Please select a time slot");
           return;
         }
         try {

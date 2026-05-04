@@ -378,6 +378,21 @@ exports.getOwnProgress = async (req, res) => {
 };
 
 // --- APPOINTMENTS ---
+const SLOT_DURATION = 20; // minutes
+const DAY_START_HOUR = 9;  // 9 AM
+const DAY_END_HOUR = 20;   // 8 PM
+
+function timeToMinutes(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function minutesToTime(mins) {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+}
+
 exports.bookAppointment = async (req, res) => {
   try {
     const { doctorId, date, time, reason } = req.body;
@@ -389,6 +404,43 @@ exports.bookAppointment = async (req, res) => {
     const doctor = await User.findOne({ _id: doctorId, role: 'doctor' });
     if (!doctor) {
       return res.status(404).json({ error: 'Doctor not found.' });
+    }
+
+    // Validate the requested time is within working hours
+    const requestedMinutes = timeToMinutes(time);
+    const startMinutes = DAY_START_HOUR * 60;
+    const endMinutes = DAY_END_HOUR * 60;
+
+    if (requestedMinutes < startMinutes || requestedMinutes >= endMinutes) {
+      return res.status(400).json({ error: `Appointments are available between ${DAY_START_HOUR}:00 AM and ${DAY_END_HOUR}:00 PM only.` });
+    }
+
+    // Validate the time aligns with a valid 20-minute slot
+    if ((requestedMinutes - startMinutes) % SLOT_DURATION !== 0) {
+      return res.status(400).json({ error: 'Please select a valid 20-minute time slot.' });
+    }
+
+    // Check for conflicts: find any non-cancelled appointment for this doctor on this date
+    // whose time is within 20 minutes of the requested time
+    const apptDate = new Date(date);
+    const startOfDay = new Date(apptDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(apptDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const existingAppointments = await Appointment.find({
+      doctorId,
+      date: { $gte: startOfDay, $lte: endOfDay },
+      status: { $nin: ['cancelled'] }
+    });
+
+    const conflict = existingAppointments.some(appt => {
+      const existingMinutes = timeToMinutes(appt.time);
+      return Math.abs(existingMinutes - requestedMinutes) < SLOT_DURATION;
+    });
+
+    if (conflict) {
+      return res.status(409).json({ error: 'This time slot is already booked. Please choose a different slot.' });
     }
 
     const appointment = await Appointment.create({
@@ -409,6 +461,47 @@ exports.bookAppointment = async (req, res) => {
   } catch (error) {
     console.error('Book appointment error:', error);
     res.status(500).json({ error: 'Server error booking appointment.' });
+  }
+};
+
+exports.getAvailableSlots = async (req, res) => {
+  try {
+    const { doctorId, date } = req.query;
+
+    if (!doctorId || !date) {
+      return res.status(400).json({ error: 'doctorId and date are required.' });
+    }
+
+    const apptDate = new Date(date);
+    const startOfDay = new Date(apptDate);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(apptDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // Get all non-cancelled bookings for this doctor on this date
+    const booked = await Appointment.find({
+      doctorId,
+      date: { $gte: startOfDay, $lte: endOfDay },
+      status: { $nin: ['cancelled'] }
+    });
+
+    const bookedMinutes = new Set(booked.map(a => timeToMinutes(a.time)));
+
+    // Generate all 20-minute slots from 09:00 to 19:40 (last slot before 20:00)
+    const startMinutes = DAY_START_HOUR * 60;
+    const endMinutes = DAY_END_HOUR * 60;
+    const slots = [];
+
+    for (let m = startMinutes; m < endMinutes; m += SLOT_DURATION) {
+      if (!bookedMinutes.has(m)) {
+        slots.push(minutesToTime(m));
+      }
+    }
+
+    res.json({ slots, date, doctorId });
+  } catch (error) {
+    console.error('Get available slots error:', error);
+    res.status(500).json({ error: 'Server error fetching available slots.' });
   }
 };
 

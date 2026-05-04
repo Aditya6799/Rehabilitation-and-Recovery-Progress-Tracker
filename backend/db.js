@@ -202,6 +202,8 @@ const appointmentSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+appointmentSchema.index({ doctorId: 1, date: 1, time: 1 });
+
 const Appointment = mongoose.model('Appointment', appointmentSchema);
 
 // Chat Schema

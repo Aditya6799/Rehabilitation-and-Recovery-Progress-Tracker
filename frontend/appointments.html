@@ -79,19 +79,19 @@
       <form id="bookForm">
         <div class="form-group">
           <label class="form-label">Select Doctor</label>
-          <select class="form-select" id="doctorSelect" required>
+          <select class="form-select" id="doctorSelect" required onchange="onSlotFilterChange()">
             <option value="">Loading doctors...</option>
           </select>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Date</label>
-            <input type="date" class="form-input" id="apptDate" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Time</label>
-            <input type="time" class="form-input" id="apptTime" required />
-          </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-input" id="apptDate" required onchange="onSlotFilterChange()" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Available Time Slots</label>
+          <select class="form-select" id="apptTimeSlot" required>
+            <option value="">Select doctor &amp; date first</option>
+          </select>
         </div>
         <div class="form-group">
           <label class="form-label">Reason</label>

@@ -30,6 +30,7 @@ router.get('/progress/:userId', authMiddleware, controllers.getUserProgress);
 // --- APPOINTMENT ROUTES ---
 
 router.post('/appointments', authMiddleware, roleMiddleware('patient'), controllers.bookAppointment);
+router.get('/appointments/slots', authMiddleware, controllers.getAvailableSlots);
 router.get('/appointments', authMiddleware, controllers.getAppointments);
 router.put('/appointments/:id', authMiddleware, roleMiddleware('doctor'), controllers.updateAppointmentStatus);
 router.get('/doctors', authMiddleware, controllers.getDoctors);
